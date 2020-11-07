@@ -7,6 +7,12 @@ class CAFFParser
 		int length;
 	} typedef IdAndLength;
 
+	struct ImageMetadata {
+		int content_size;
+		int width;
+		int height;
+	} typedef ImageMetadata;
+
 	private:
 		IdAndLength GetBlockIdAndLength(std::ifstream* infile);
 		void ParseCAFFAnimation(std::ifstream* infile, char* preview);

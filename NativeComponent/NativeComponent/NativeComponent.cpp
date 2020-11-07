@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     consoleParams.handleConsoleParameters(argc, argv);
 
     std::ifstream infile;
-    infile.open("../../TestResources/1.caff", std::ios::binary | std::ios::in);
+    infile.open("../../TestResources/3.caff", std::ios::binary | std::ios::in);
    
     CAFFParser cP = CAFFParser();
     char* preview = NULL;
