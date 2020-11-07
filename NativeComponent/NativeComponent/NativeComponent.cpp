@@ -5,9 +5,13 @@
 #include <fstream>
 #include <sstream>
 #include "CAFFParser.h"
+#include "ConsoleParameterParser.h"
 
-int main()
+int main(int argc, char* argv[])
 {
+    ConsoleParameterParserNamespace::ConsoleParameterParser consoleParams = ConsoleParameterParserNamespace::ConsoleParameterParser();
+    consoleParams.handleConsoleParameters(argc, argv);
+
     std::ifstream infile;
     infile.open("../../TestResources/1.caff", std::ios::binary | std::ios::in);
    
