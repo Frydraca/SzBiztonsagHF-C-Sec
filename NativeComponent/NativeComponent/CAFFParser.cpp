@@ -1,7 +1,23 @@
 #include "CAFFParser.h"
 #include <iostream>
 #include "lodepng.h"
+#include <time.h>
+#include <algorithm>
+#include <sstream>
 
+
+const std::string currentDateTime() {
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	localtime_s(&tstruct, &now);
+
+	strftime(buf, sizeof(buf), "%Y_%m_%d_%X", &tstruct);
+	std::string ret(buf);
+	std::replace(ret.begin(), ret.end(), ':', '_');
+
+	return ret;
+}
 
 CAFFParser::IdAndLength CAFFParser::GetBlockIdAndLength(std::ifstream* infile)
 {
@@ -10,17 +26,14 @@ CAFFParser::IdAndLength CAFFParser::GetBlockIdAndLength(std::ifstream* infile)
 	infile->read(id, sizeof(id));
 	ret.id = int(id[0]);
 
-	std::cout << "id: " << ret.id << std::endl;
-
 	char length[8];
 	infile->read(length, sizeof(length));
 	std::memcpy(&ret.length, length, sizeof(int));
 
-	std::cout << "length: " << ret.length << std::endl;
 	return ret;
 }
 
-void CAFFParser::ParseCAFFAnimation(std::ifstream* infile, char* preview)
+void CAFFParser::ParseCAFFAnimation(std::ifstream* infile, char* fname, CAFFMetadata* caffMetadata)
 {
 	char duration[8];
 	infile->read(duration, sizeof(duration));
@@ -46,9 +59,25 @@ void CAFFParser::ParseCAFFAnimation(std::ifstream* infile, char* preview)
 	infile->read(height, sizeof(height));
 	std::memcpy(&metadata.height, height, sizeof(int));
 
-	char* skip = new char[header_size_value - 44];
-	infile->read(skip, (header_size_value-44));
-	delete[] skip;
+	char c;
+	std::stringstream caption_stream;
+	while (infile->get(c)) {
+		if (c == '\n') {
+			break;
+		}
+		caption_stream << c;
+	}
+	caffMetadata->PreviewCaption = caption_stream.str();
+
+	int tagslength = header_size_value - 36 - caffMetadata->PreviewCaption.length() -1;
+	char* tags = new char[tagslength];
+	infile->read(tags, tagslength);
+	std::stringstream tags_stream;
+	for (int i = 0; i < tagslength; i++) {
+		tags_stream << ((tags[i] == '\0' && i != tagslength - 1) ? ',' : tags[i]);
+	}
+	caffMetadata->PreviewTags = tags_stream.str();
+
 
 	char* image_bytes = new char[metadata.content_size];
 	infile->read(image_bytes, metadata.content_size);
@@ -59,11 +88,48 @@ void CAFFParser::ParseCAFFAnimation(std::ifstream* infile, char* preview)
 	delete[] image_bytes;
 	std::vector<unsigned char> ImageBuffer;
 
+	std::string filename_old(fname);
+	std::string act_time = currentDateTime();
+	std::string preview_path = "../../Previews/" + filename_old + "_" + act_time + "_preview.png";
+
 	lodepng::encode(ImageBuffer,unsigned_image_bytes,metadata.width,metadata.height,LCT_RGB,8U);
-	lodepng::save_file(ImageBuffer,"c:/BME/C-Sec/SzBiztonsagHF-C-Sec/preview.png");
+	lodepng::save_file(ImageBuffer,preview_path);
+	caffMetadata->PreviewPath = preview_path;
 }
 
-void CAFFParser::ReturnPreview(std::ifstream* infile, char* preview)
+void CAFFParser::ParseCAFFCredit(std::ifstream* infile, CAFFMetadata* caffMetadata)
+{
+	char year[2];
+	infile->read(year, sizeof(year));
+	std::string year_value = std::to_string(static_cast<int>(static_cast<unsigned char>(year[0])) | static_cast<int>(static_cast<unsigned char>(year[1])) << 8);
+	char month[1];
+	infile->read(month, sizeof(month));
+	std::string month_value = std::to_string(static_cast<int>(static_cast<unsigned char>(month[0])));
+	char day[1];
+	infile->read(day, sizeof(day));
+	std::string day_value = std::to_string(static_cast<int>(static_cast<unsigned char>(day[0])));
+	char hour[1];
+	infile->read(hour, sizeof(hour));
+	std::string hour_value = std::to_string(static_cast<int>(static_cast<unsigned char>(hour[0])));
+	char minute[1];
+	infile->read(minute, sizeof(minute));
+	std::string minute_value = std::to_string(static_cast<int>(static_cast<unsigned char>(minute[0])));
+
+	caffMetadata->CreationDate = year_value + "-" + month_value + "-" + day_value + "." + hour_value + ":" + minute_value;
+
+	char creator_len[8];
+	infile->read(creator_len, sizeof(creator_len));
+	int creator_len_value;
+	std::memcpy(&creator_len_value, creator_len, sizeof(int));
+
+	char* creator = new char[creator_len_value+1];
+	infile->read(creator, creator_len_value);
+	creator[creator_len_value] = '\0';
+	std::string str_creator(creator);
+	caffMetadata->Creator = str_creator;
+}
+
+CAFFParser::CAFFMetadata CAFFParser::ReturnPreview(std::ifstream* infile, char* fname)
 {
 	IdAndLength headerBlock = GetBlockIdAndLength(infile);
 
@@ -72,22 +138,26 @@ void CAFFParser::ReturnPreview(std::ifstream* infile, char* preview)
 		infile->read(header_data, headerBlock.length);
 		int num_anim_value;
 		std::memcpy(&num_anim_value, &header_data[12], sizeof(int));
-		std::cout << num_anim_value << std::endl;
 
 		if (num_anim_value > 0) {
-			while (true) {
+			CAFFMetadata caffMetadata;
+			int picCount = 0;
+			while (!infile->eof()) {
 				IdAndLength actBlock = GetBlockIdAndLength(infile);
 
-				if (actBlock.id != 3) {
-					char* skip = new char[actBlock.length];
-					infile->read(skip, actBlock.length);
-					delete[] skip;
+				if (actBlock.id != 2 && actBlock.id != 3) {
+					break;
 				}
-				else {
-					ParseCAFFAnimation(infile, preview);
-					return;
+				if (actBlock.id == 2) {
+					ParseCAFFCredit(infile, &caffMetadata);
+				}
+				if (actBlock.id == 3 && picCount == 0) {
+					ParseCAFFAnimation(infile, fname, &caffMetadata);
+					picCount++;
 				}
 			}
+
+			return caffMetadata;
 		}
 	}
 }

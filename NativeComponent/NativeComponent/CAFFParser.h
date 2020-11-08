@@ -12,12 +12,23 @@ class CAFFParser
 		int width;
 		int height;
 	} typedef ImageMetadata;
+	
+	public:
+		struct CAFFMetadata {
+			std::string CreationDate;
+			std::string Creator;
+			std::string PreviewCaption;
+			std::string PreviewTags;
+			std::string PreviewPath;
+		} typedef CAFFMetadata;
 
 	private:
 		IdAndLength GetBlockIdAndLength(std::ifstream* infile);
-		void ParseCAFFAnimation(std::ifstream* infile, char* preview);
+		void ParseCAFFAnimation(std::ifstream* infile, char* fname, CAFFMetadata* caffMetadata);
+		void ParseCAFFCredit(std::ifstream* infile, CAFFMetadata* caffMetadata);
 
 	public:
-		void ReturnPreview(std::ifstream* infile, char* preview);
+		CAFFMetadata ReturnPreview(std::ifstream* infile, char* fname);
+
 };
 

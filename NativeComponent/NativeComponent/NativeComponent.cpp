@@ -9,26 +9,23 @@
 
 int main(int argc, char* argv[])
 {
-    ConsoleParameterParserNamespace::ConsoleParameterParser consoleParams = ConsoleParameterParserNamespace::ConsoleParameterParser();
-    consoleParams.handleConsoleParameters(argc, argv);
+    const char* path_of_file = "../../TestResources/3.caff";
+    char fname[_MAX_FNAME];
+
+    errno_t error = _splitpath_s(path_of_file,
+        NULL, 0,
+        NULL, 0,
+        fname, _MAX_FNAME,
+        NULL, 0);
 
     std::ifstream infile;
-    infile.open("../../TestResources/3.caff", std::ios::binary | std::ios::in);
-   
+    infile.open(path_of_file, std::ios::binary | std::ios::in);
+
+
     CAFFParser cP = CAFFParser();
-    char* preview = NULL;
-    cP.ReturnPreview(&infile, preview);
+    CAFFParser::CAFFMetadata parseResult = cP.ReturnPreview(&infile, fname);
+
+    std::cout << "{" << std::endl << "\t\"CreationDate\": \"" << parseResult.CreationDate << "\"," << std::endl << "\t\"Creator\": \"" << parseResult.Creator << "\"," << std::endl << "\t\"PreviewCaption\": \"" << parseResult.PreviewCaption << "\"," << std::endl << "\t\"PreviewTags\": \"" << parseResult.PreviewTags << "\"," << std::endl << "\t\"PreviewPath\": \"" << parseResult.PreviewPath << "\"" << std::endl << "}";
+
     infile.close();
-    delete[] preview;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
