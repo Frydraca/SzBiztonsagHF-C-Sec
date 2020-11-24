@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ServerApplication.BLL.Models.User.DB;
+using ServerApplication.BLL.Services;
+using ServerApplication.BLL.Services.Interfaces;
 
 namespace ServerApplication
 {
@@ -21,6 +25,22 @@ namespace ServerApplication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+
+            var serviceProvider = services.BuildServiceProvider();
+            var userManager = serviceProvider.GetService<UserManager<User>>();
+            var signInManager = serviceProvider.GetService<SignInManager<User>>();
+
+            services.AddSingleton<IAuthService>(
+                new AuthService(
+                    Configuration.GetValue<string>("JwtKey"),
+                    Configuration.GetValue<int>("JwtExpiredays"),
+                    userManager,
+                    signInManager
+                )
+            );
+
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
