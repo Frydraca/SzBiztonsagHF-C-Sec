@@ -33,13 +33,13 @@ namespace ServerApplication.BLL.Services
         {
             if (registration.Password == registration.RepeatedPassword)
             {
-                var user = new User { };
+                var user = new User { UserName = registration.UserName };
                 var result = await userManager.CreateAsync(user, registration.Password);
 
                 if (result.Succeeded)
                 {
                     await signInManager.SignInAsync(user, false);
-                    return new Guid(user.Id.ToByteArray()); // TODO return new Guid(user.Id);
+                    return new Guid(user.Id.ToByteArray());
                 }
                 throw new Exception("Couldn't create a User with the provided credentials!");
             }
@@ -78,7 +78,7 @@ namespace ServerApplication.BLL.Services
             if (result.Succeeded)
             {
                 var user = userManager.Users.SingleOrDefault(u => u.UserName.ToLower() == login.UserName.ToLower());
-                return new Guid(user.Id.ToByteArray());  // TODO return new Guid(user.Id);
+                return new Guid(user.Id.ToByteArray());
             }
             throw new Exception("Wrong credentials!");
         }
