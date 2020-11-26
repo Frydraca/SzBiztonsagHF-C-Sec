@@ -11,6 +11,6 @@ namespace ServerApplication.BLL.Services.Interfaces
         public string CreateNewCaffFile(CaffFile newCaffFile);
         public IEnumerable<CaffFile> GetAllCaffFiles();
         public IEnumerable<CaffFile> GetOwnCaffFiles(string userId);
-        public CaffFile GetCaffFile(string caffFileId);
+        public CaffFile GetCaffFile(string caffFileId, string userId);
     }
 }
