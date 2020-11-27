@@ -1,14 +1,12 @@
-﻿using ServerApplication.BLL.Models.DB;
+﻿using ServerApplication.BLL.Models.CaffFile.DB;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ServerApplication.BLL.Models.CaffFile.DB
+namespace ServerApplication.API.DTOs.CaffFile
 {
-    [Table("CaffFiles")]
-    public class CaffFile : DBModel
+    public class CaffFileData
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -16,6 +14,5 @@ namespace ServerApplication.BLL.Models.CaffFile.DB
         public string FilePath { get; set; }
         public DateTime CreationDate { get; set; }
         public List<Comment> Comments { get; set; }
-
     }
 }
