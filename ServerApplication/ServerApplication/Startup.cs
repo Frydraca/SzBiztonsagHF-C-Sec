@@ -13,8 +13,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using ServerApplication.API.Mapping;
 using ServerApplication.BLL.Models.User.DB;
+using ServerApplication.BLL.RepositoryInterfaces;
 using ServerApplication.BLL.Services;
 using ServerApplication.BLL.Services.Interfaces;
+using ServerApplication.DATA.Context;
+using ServerApplication.DATA.Context.Interfaces;
+using ServerApplication.DATA.Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -81,6 +85,9 @@ namespace ServerApplication
 
             services.AddControllersWithViews();
 
+            services.AddScoped<IMongoDBContext, MongoDBContext>();
+
+            services.AddScoped<ICaffFileRepository, CaffFileRepository>();
 
             var serviceProvider = services.BuildServiceProvider();
             var userManager = serviceProvider.GetService<UserManager<User>>();
@@ -94,6 +101,8 @@ namespace ServerApplication
                     signInManager
                 )
             );
+            services.AddScoped<ICaffService, CaffService>();
+            services.AddScoped<IUserManagementService, UserManagementService>();
 
 
             // In production, the Angular files will be served from this directory

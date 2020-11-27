@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using ServerApplication.API.DTOs.Auth;
+using ServerApplication.API.DTOs.User;
 using ServerApplication.BLL.Models.Auth;
+using ServerApplication.BLL.Models.User;
+using ServerApplication.BLL.Models.User.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +17,8 @@ namespace ServerApplication.API.Mapping
         {
             CreateMap<RegistrationData, Registration>();
             CreateMap<LoginData, Login>();
+            CreateMap<UserData, User>();
+            CreateMap<ChangePasswordData, ChangePassword>();
         }
     }
 }
