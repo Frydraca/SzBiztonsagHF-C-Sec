@@ -39,7 +39,7 @@ namespace ServerApplication.BLL.Services
                 if (result.Succeeded)
                 {
                     await signInManager.SignInAsync(user, false);
-                    return new Guid(user.Id.ToByteArray());
+                    return new Guid(user.Id);
                 }
                 throw new Exception("Couldn't create a User with the provided credentials!");
             }
@@ -78,7 +78,7 @@ namespace ServerApplication.BLL.Services
             if (result.Succeeded)
             {
                 var user = userManager.Users.SingleOrDefault(u => u.UserName.ToLower() == login.UserName.ToLower());
-                return new Guid(user.Id.ToByteArray());
+                return new Guid(user.Id);
             }
             throw new Exception("Wrong credentials!");
         }

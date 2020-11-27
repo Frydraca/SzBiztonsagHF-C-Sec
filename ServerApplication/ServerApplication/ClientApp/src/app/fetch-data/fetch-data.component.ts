@@ -1,32 +1,67 @@
 import { Component, Inject } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import axios from "axios";
 
 @Component({
   selector: "app-fetch-data",
   templateUrl: "./fetch-data.component.html",
 })
 export class FetchDataComponent {
-  public forecasts: WeatherForecast[];
+  public testList: Test[];
+  public baseURL: string;
 
-  constructor(http: HttpClient, @Inject("BASE_URL") baseUrl: string) {
-    http
-      .post(baseUrl + "auth/register", {
+  constructor(@Inject("BASE_URL") baseUrl: string) {
+    this.baseURL = baseUrl;
+    this.testList = [
+      { name: "Register Test", action: this.registerTest, status: "blue" },
+      { name: "Login Test", action: this.loginTest, status: "blue" },
+    ];
+  }
+
+  runAction = (name: string) => {
+    console.log(name);
+    this.testList.find((t) => t.name == name).action();
+  };
+
+  registerTest = () => {
+    axios
+      .post(this.baseURL + "auth/register", {
         userName: "alma",
         password: "almaalma",
         repeatedPassword: "almaalma",
       })
-      .subscribe(
-        (result) => {
-          console.log(result);
+      .then(
+        (success) => {
+          console.log(success.data);
+          this.testList.find((t) => t.name == "Register Test").status = "green";
         },
-        (error) => console.error(error)
+        (error) => {
+          console.log(error.response.data.error);
+          this.testList.find((t) => t.name == "Register Test").status = "red";
+        }
       );
-  }
+  };
+
+  loginTest = () => {
+    axios
+      .post(this.baseURL + "auth/login", {
+        userName: "alma",
+        password: "almaalma",
+      })
+      .then(
+        (success) => {
+          console.log(success.data);
+          this.testList.find((t) => t.name == "Login Test").status = "green";
+        },
+        (error) => {
+          console.log(error.response.data.error);
+          this.testList.find((t) => t.name == "Login Test").status = "red";
+        }
+      );
+  };
 }
 
-interface WeatherForecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
+interface Test {
+  name: string;
+  action: () => void;
+  status: string;
 }
