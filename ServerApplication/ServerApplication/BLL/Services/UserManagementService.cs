@@ -18,38 +18,55 @@ namespace ServerApplication.BLL.Services
             this.userManager = userManager;
         }
 
-        public async Task<bool> ChangeUserPassword(User targetUser, User askingUser, ChangePassword changePassword)
+        public async Task<string> ChangeUserPassword(User targetUser, string askingUserId, ChangePassword changePassword)
         {
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
             if (!hasAccessToUserData(targetUser, askingUser))
             {
                 throw new Exception("You have no access to this user!");
             }
-            else if(!askingUser.IsAdmin && changePassword.NewPassword != changePassword.RepeatedNewPassword)
+            
+            if (askingUser.IsAdmin)
             {
-                throw new Exception("The passwords are different!");
+                var resetToken = await userManager.GeneratePasswordResetTokenAsync(targetUser);
+                var result = await userManager.ResetPasswordAsync(targetUser, resetToken, changePassword.NewPassword);
+                if (result.Succeeded)
+                {
+                    return targetUser.Id;                  
+                }
+                throw new Exception("Password change failed!");
             }
             else
             {
-                if (askingUser.IsAdmin)
+                if (changePassword.NewPassword != changePassword.RepeatedNewPassword)
                 {
-                    var resetToken = await userManager.GeneratePasswordResetTokenAsync(targetUser);
-                    var result = await userManager.ResetPasswordAsync(targetUser, resetToken, changePassword.NewPassword);
-                    if (result.Succeeded)
-                    {
-                        return true;                  
-                    }
-                    throw new Exception("Password change failed!");
+                    throw new Exception("The passwords are different!");
                 }
-                else
+
+                var result = await userManager.ChangePasswordAsync(targetUser, changePassword.OldPassword, changePassword.NewPassword);
+                if(result.Succeeded)
                 {
-                    var result = await userManager.ChangePasswordAsync(targetUser, changePassword.OldPassword, changePassword.NewPassword);
-                    if(result.Succeeded)
-                    {
-                        return true;
-                    }
-                    throw new Exception("Wrong password!");
+                    return targetUser.Id;
                 }
+                throw new Exception("Wrong password!");
             }
+            
+        }
+        public async Task<string> UpdateUser(User targetUser, string askingUserId)
+        {
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToUserData(targetUser, askingUser))
+            {
+                throw new Exception("You have no access to this user!"); 
+            }
+            
+            var result = await userManager.UpdateAsync(targetUser);
+            if(result.Succeeded)
+            {
+                return targetUser.Id;
+            }
+            throw new Exception("Update was unsuccessfull!");
+            
         }
 
         public async Task<User> GetUser(string id)
@@ -62,21 +79,14 @@ namespace ServerApplication.BLL.Services
             throw new Exception("Couldn't find the user!");
         }
 
-        public async Task<bool> UpdateUser(User targetUser, User askingUser)
+        public async Task<List<User>> GetAllUsers(string askingUserId)
         {
-            if(!hasAccessToUserData(targetUser, askingUser))
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!askingUser.IsAdmin)
             {
-                throw new Exception("You have no access to this user!"); 
+                throw new Exception("You have no access to all the users!");
             }
-            else
-            {
-                var result = await userManager.UpdateAsync(targetUser);
-                if(result.Succeeded)
-                {
-                    return true;
-                }
-                throw new Exception("Update was unsuccessfull!");
-            }
+            return userManager.Users.ToList();
         }
 
         private bool hasAccessToUserData(User targetUser, User askingUser)

@@ -9,10 +9,12 @@ namespace ServerApplication.BLL.Services.Interfaces
 {
     public interface IUserManagementService
     {
-        public Task<bool> UpdateUser(User targetUser, User askingUser);
+        public Task<string> UpdateUser(User targetUser, string askingUserId);
 
-        public Task<bool> ChangeUserPassword(User targetUser, User askingUser, ChangePassword changePassword);
+        public Task<string> ChangeUserPassword(User targetUser, string askingUserId, ChangePassword changePassword);
 
         public Task<User> GetUser(string id);
+
+        public Task<List<User>> GetAllUsers(string askingUserId);
     }
 }

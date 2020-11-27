@@ -8,12 +8,54 @@ import axios from "axios";
 export class FetchDataComponent {
   public testList: Test[];
   public baseURL: string;
+  public header: {};
 
   constructor(@Inject("BASE_URL") baseUrl: string) {
     this.baseURL = baseUrl;
+    this.generateAuthenticationHeadder();
     this.testList = [
-      { name: "Register Test", action: this.registerTest, status: "blue" },
-      { name: "Login Test", action: this.loginTest, status: "blue" },
+      {
+        name: "Register Test",
+        action: () => {
+          this.registerTest("Register Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Login Test",
+        action: () => {
+          this.loginTest("Login Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Get User Test",
+        action: () => {
+          this.getUserTest("Get User Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Get All Users Test",
+        action: () => {
+          this.getAllUsersTest("Get All Users Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Edit User Test",
+        action: () => {
+          this.editUserTest("Edit User Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Change User Password Test",
+        action: () => {
+          this.changePasswordTest("Change User Password Test");
+        },
+        status: "blue",
+      },
     ];
   }
 
@@ -22,7 +64,7 @@ export class FetchDataComponent {
     this.testList.find((t) => t.name == name).action();
   };
 
-  registerTest = () => {
+  registerTest = (name: string) => {
     axios
       .post(this.baseURL + "auth/register", {
         userName: "alma",
@@ -32,16 +74,16 @@ export class FetchDataComponent {
       .then(
         (success) => {
           console.log(success.data);
-          this.testList.find((t) => t.name == "Register Test").status = "green";
+          this.testList.find((t) => t.name == name).status = "green";
         },
         (error) => {
           console.log(error.response.data.error);
-          this.testList.find((t) => t.name == "Register Test").status = "red";
+          this.testList.find((t) => t.name == name).status = "red";
         }
       );
   };
 
-  loginTest = () => {
+  loginTest = (name: string) => {
     axios
       .post(this.baseURL + "auth/login", {
         userName: "admin",
@@ -50,13 +92,133 @@ export class FetchDataComponent {
       .then(
         (success) => {
           console.log(success.data);
-          this.testList.find((t) => t.name == "Login Test").status = "green";
+          this.testList.find((t) => t.name == name).status = "green";
         },
         (error) => {
           console.log(error.response.data.error);
-          this.testList.find((t) => t.name == "Login Test").status = "red";
+          this.testList.find((t) => t.name == name).status = "red";
         }
       );
+  };
+
+  getUserTest = (name: string) => {
+    axios({
+      method: "GET",
+      url: this.baseURL + "usermanagement",
+      headers: this.header,
+    }).then(
+      (success) => {
+        console.log(success.data);
+        this.testList.find((t) => t.name == name).status = "green";
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  getAllUsersTest = (name: string) => {
+    axios({
+      method: "GET",
+      url: this.baseURL + "usermanagement/all",
+      headers: this.header,
+    }).then(
+      (success) => {
+        console.log(success.data);
+        this.testList.find((t) => t.name == name).status = "green";
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  editUserTest = (name: string) => {
+    axios({
+      method: "GET",
+      url: this.baseURL + "usermanagement/all",
+      headers: this.header,
+    }).then(
+      (successfulGet) => {
+        axios({
+          method: "PUT",
+          url: this.baseURL + "usermanagement",
+          headers: this.header,
+          data: {
+            id: successfulGet.data[successfulGet.data.length - 1].id,
+            userName:
+              successfulGet.data[successfulGet.data.length - 1].userName +
+              "korte",
+          },
+        }).then(
+          (success) => {
+            console.log(success.data);
+            this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  changePasswordTest = (name: string) => {
+    axios
+      .post(this.baseURL + "auth/register", {
+        userName: "kacsa",
+        password: "kacsakacsa",
+        repeatedPassword: "kacsakacsa",
+      })
+      .then(
+        (successfullReg) => {
+          axios({
+            method: "POST",
+            url: this.baseURL + "usermanagement/change-password",
+            headers: this.header,
+            data: {
+              id: successfullReg.data.id,
+              userName: "kacsa",
+              oldPassword: "kacsakacsa",
+              newPassword: "kacsakacsa++",
+              repeatedNewPassword: "kacsakacsa++",
+            },
+          }).then(
+            (success) => {
+              console.log(success.data);
+              this.testList.find((t) => t.name == name).status = "green";
+            },
+            (error) => {
+              console.log(error.response.data.error);
+              this.testList.find((t) => t.name == name).status = "red";
+            }
+          );
+        },
+        (error) => {
+          console.log(error.response.data.error);
+          this.testList.find((t) => t.name == name).status = "red";
+        }
+      );
+  };
+
+  generateAuthenticationHeadder = () => {
+    axios
+      .post(this.baseURL + "auth/login", {
+        userName: "admin",
+        password: "SecretPassword",
+      })
+      .then((ret) => {
+        this.header = {
+          Authorization: "Bearer " + ret.data.token,
+        };
+      });
   };
 }
 

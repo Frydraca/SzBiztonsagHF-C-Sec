@@ -20,6 +20,8 @@ namespace ServerApplication.API.Mapping
             CreateMap<RegistrationData, Registration>();
             CreateMap<LoginData, Login>();
             CreateMap<UserData, User>();
+            CreateMap<User, UserData>();
+            CreateMap<ChangePasswordData, User>();
             CreateMap<ChangePasswordData, ChangePassword>();
             CreateMap<CaffFileData, CaffFile>();
             CreateMap<CaffFile, CaffFileData>();
