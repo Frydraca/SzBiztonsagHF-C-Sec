@@ -12,5 +12,7 @@ namespace ServerApplication.BLL.Models.Auth
         public string Password { get; set; }
 
         public string RepeatedPassword { get; set; }
+
+        public bool IsAdmin { get; set; }
     }
 }

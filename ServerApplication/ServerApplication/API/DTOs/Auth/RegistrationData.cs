@@ -12,5 +12,7 @@ namespace ServerApplication.API.DTOs.Auth
         public string Password { get; set; }
 
         public string RepeatedPassword { get; set; }
+
+        public bool IsAdmin { get; set; }
     }
 }
