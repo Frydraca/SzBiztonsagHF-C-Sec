@@ -27,13 +27,16 @@ namespace ServerApplication.BLL.Services
             this.jwtLifespan = jwtLifespan;
             this.userManager = userManager;
             this.signInManager = signInManager;
+
+            checkForAdmin();
+
         }
 
         public async Task<Guid> CreateNewUser(Registration registration)
         {
             if (registration.Password == registration.RepeatedPassword)
             {
-                var user = new User { UserName = registration.UserName, IsAdmin = false};
+                var user = new User { UserName = registration.UserName, IsAdmin = false };
                 var result = await userManager.CreateAsync(user, registration.Password);
 
                 if (result.Succeeded)
@@ -81,6 +84,17 @@ namespace ServerApplication.BLL.Services
                 return new Guid(user.Id);
             }
             throw new Exception("Wrong credentials!");
+        }
+
+        private async void checkForAdmin()
+        {
+            var result = await userManager.FindByNameAsync("admin");
+
+            if (result == null)
+            {
+                var admin = new User { UserName = "admin" , IsAdmin = true };
+                await userManager.CreateAsync(admin, "SecretPassword");
+            }
         }
     }
 }

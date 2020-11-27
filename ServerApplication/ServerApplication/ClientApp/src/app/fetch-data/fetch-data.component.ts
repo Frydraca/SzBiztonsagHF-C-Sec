@@ -44,8 +44,8 @@ export class FetchDataComponent {
   loginTest = () => {
     axios
       .post(this.baseURL + "auth/login", {
-        userName: "alma",
-        password: "almaalma",
+        userName: "admin",
+        password: "SecretPassword",
       })
       .then(
         (success) => {
