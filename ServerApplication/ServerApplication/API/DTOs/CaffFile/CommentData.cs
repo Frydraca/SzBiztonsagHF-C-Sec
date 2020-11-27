@@ -1,14 +1,11 @@
-﻿using ServerApplication.BLL.Models.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ServerApplication.BLL.Models.CaffFile.DB
+namespace ServerApplication.API.DTOs.CaffFile
 {
-    [Table("Comments")]
-    public class Comment : DBModel
+    public class CommentData
     {
         public string Id { get; set; }
         public string Owner { get; set; }

@@ -52,6 +52,58 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.Query(caffFile => caffFile.Owner == userId);
         }
 
+        public string UpdateCaffFile(CaffFile updatedCaffFile, string userId)
+        {
+            if (!hasAccessToCaffFile(updatedCaffFile.Id, userId))
+            {
+                throw new Exception("You have no access to this caff file!");
+            }
+            if (caffFileRepository.Update(updatedCaffFile))
+            {
+                return updatedCaffFile.Id;
+            }
+
+            throw new Exception("Couldn't update this caff file!");
+        }
+
+        public string DeleteCaffFile(string caffFileId, string userId)
+        {
+            if (!hasAccessToCaffFile(caffFileId, userId))
+            {
+                throw new Exception("You have no access to this caff file!");
+            }
+            if (caffFileRepository.Delete(caffFileId))
+            {
+                return caffFileId;
+            }
+
+            throw new Exception("Couldn't delete this caff file!");
+        }
+
+        public string CreateNewComment(Comment newComment, string parentCaffId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Comment GetComment(string commentId, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Comment> GetCommentsOfCaffFile(string parentCaffId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string UpdateComment(Comment updatedComment, string userId)
+        {
+            throw new NotImplementedException();
+        }
+        public string DeleteComment(string commentId, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         private bool hasAccessToCaffFile(string caffFileId, string userId)
         {
             var caffFile = caffFileRepository.Find(caffFileId);
