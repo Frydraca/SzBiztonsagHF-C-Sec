@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerApplication.API.DTOs.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace ServerApplication.API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("[controller]")]
     public class CaffController : ControllerBase
