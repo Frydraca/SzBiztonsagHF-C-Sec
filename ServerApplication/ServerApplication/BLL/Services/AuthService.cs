@@ -33,7 +33,7 @@ namespace ServerApplication.BLL.Services
         {
             if (registration.Password == registration.RepeatedPassword)
             {
-                var user = new User { UserName = registration.UserName, IsAdmin = registration.IsAdmin };
+                var user = new User { UserName = registration.UserName, IsAdmin = false};
                 var result = await userManager.CreateAsync(user, registration.Password);
 
                 if (result.Succeeded)

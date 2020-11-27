@@ -8,6 +8,5 @@ namespace ServerApplication.BLL.Services.Interfaces
 {
     public interface IUserDataService
     {
-        public bool ChangeUserName(string askingUserId, UserNameChange userNameChange);
     }
 }

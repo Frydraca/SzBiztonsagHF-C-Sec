@@ -9,9 +9,5 @@ namespace ServerApplication.BLL.Services
 {
     public class UserDataService : IUserDataService
     {
-        public bool ChangeUserName(string askingUserId, UserNameChange userNameChange)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
