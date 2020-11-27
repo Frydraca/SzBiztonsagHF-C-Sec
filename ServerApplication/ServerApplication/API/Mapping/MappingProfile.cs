@@ -3,6 +3,7 @@ using ServerApplication.API.DTOs.Auth;
 using ServerApplication.API.DTOs.CaffFile;
 using ServerApplication.API.DTOs.User;
 using ServerApplication.BLL.Models.Auth;
+using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
 using ServerApplication.BLL.Models.User;
 using ServerApplication.BLL.Models.User.DB;
@@ -25,6 +26,8 @@ namespace ServerApplication.API.Mapping
             CreateMap<ChangePasswordData, ChangePassword>();
             CreateMap<CaffFileData, CaffFile>();
             CreateMap<CaffFile, CaffFileData>();
+            CreateMap<CommentData, Comment>();
+            CreateMap<Comment, CommentData>();
         }
     }
 }

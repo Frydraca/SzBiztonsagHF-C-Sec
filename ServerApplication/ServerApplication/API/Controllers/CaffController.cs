@@ -26,18 +26,35 @@ namespace ServerApplication.API.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost("create-caff-file")]
+        [HttpGet]
+        public ActionResult<List<CaffFileData>> GetOwnCaffFiles()
+        {
+            var userId = this.User.Claims.FirstOrDefault().Value;
+
+            try
+            {
+                var caffFiles = caffService.GetOwnCaffFiles(userId);
+                return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpPost]
         public ActionResult<CaffFileIdData> PostCaffFile([FromBody] CaffFileData model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
-                var responseId = new CaffFileIdData()
+                var caffFileId = caffService.CreateNewCaffFile(mapper.Map<CaffFile>(model), userId);
+                return new CaffFileIdData()
                 {
-                    Id = caffService.CreateNewCaffFile(mapper.Map<CaffFile>(model))
+                    Id = caffFileId
                 };
-                return responseId;
             }
             catch (Exception e)
             {
@@ -48,8 +65,6 @@ namespace ServerApplication.API.Controllers
         [HttpGet("{id}")]
         public ActionResult<CaffFileData> GetCaffFile(string caffId)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var userId = this.User.Claims.FirstOrDefault().Value;
 
             try
@@ -66,29 +81,9 @@ namespace ServerApplication.API.Controllers
         [HttpGet("all")]
         public ActionResult<List<CaffFileData>> GetAllCaffFiles()
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             try
             {
                 var caffFiles = caffService.GetAllCaffFiles();
-                return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { error = e.Message });
-            }
-        }
-
-        [HttpGet("own-caff-files")]
-        public ActionResult<List<CaffFileData>> GetOwnCaffFiles()
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var userId = this.User.Claims.FirstOrDefault().Value;
-
-            try
-            {
-                var caffFiles = caffService.GetOwnCaffFiles(userId);
                 return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
             }
             catch (Exception e)

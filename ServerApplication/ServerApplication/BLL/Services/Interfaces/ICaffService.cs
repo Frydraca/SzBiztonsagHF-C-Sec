@@ -1,4 +1,5 @@
 ﻿using ServerApplication.BLL.Models.CaffFile.DB;
+using ServerApplication.BLL.Models.CaffFile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,10 @@ namespace ServerApplication.BLL.Services.Interfaces
 {
     public interface ICaffService
     {
-        public string CreateNewCaffFile(CaffFile newCaffFile);
+        public string CreateNewCaffFile(CaffFile newCaffFile, string askingUserId);
         public IEnumerable<CaffFile> GetAllCaffFiles();
-        public IEnumerable<CaffFile> GetOwnCaffFiles(string userId);
-        public CaffFile GetCaffFile(string caffFileId, string userId);
+        public IEnumerable<CaffFile> GetOwnCaffFiles(string askingUserId);
+        public CaffFile GetCaffFile(string caffFileId, string askingUserId);
         public string UpdateCaffFile(CaffFile updatedCaffFile, string userId);
         public string DeleteCaffFile(string caffFileId, string userId);
         public string CreateNewComment(Comment newComment, string parentCaffId);

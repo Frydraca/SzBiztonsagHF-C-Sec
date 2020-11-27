@@ -10,7 +10,6 @@ namespace ServerApplication.BLL.Models.CaffFile.DB
     [Table("CaffFiles")]
     public class CaffFile : DBModel
     {
-        public string Id { get; set; }
         public string Name { get; set; }
         public string Owner { get; set; }
         public string FilePath { get; set; }

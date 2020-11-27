@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
 using ServerApplication.BLL.RepositoryInterfaces;
 using ServerApplication.BLL.Services.Interfaces;
@@ -18,10 +19,20 @@ namespace ServerApplication.BLL.Services
             this.caffFileRepository = caffFileRepository;
         }
 
-        public string CreateNewCaffFile(CaffFile newCaffFile)
+        public string CreateNewCaffFile(CaffFile newCaffFile, string askingUserId)
         {
             var id = ObjectId.GenerateNewId().ToString();
             newCaffFile.Id = id;
+            newCaffFile.Owner = askingUserId;
+            newCaffFile.CreationDate = DateTime.Now;
+
+            newCaffFile.Comments.ForEach(c =>
+            {
+                c.Id = ObjectId.GenerateNewId().ToString();
+                c.CreationDate = newCaffFile.CreationDate;
+                c.Owner = askingUserId;
+            });
+
             if (caffFileRepository.Create(newCaffFile))
             {
                 return id;
@@ -37,9 +48,9 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.QueryAll();
         }
 
-        public CaffFile GetCaffFile(string caffFileId, string userId)
+        public CaffFile GetCaffFile(string caffFileId, string askingUserId)
         {
-            if (!hasAccessToCaffFile(caffFileId, userId))
+            if (!hasAccessToCaffFile(caffFileId, askingUserId))
             {
                 throw new Exception("You have no access to this caff file!");
             }
@@ -47,9 +58,9 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.Find(caffFileId);
         }
 
-        public IEnumerable<CaffFile> GetOwnCaffFiles(string userId)
+        public IEnumerable<CaffFile> GetOwnCaffFiles(string askingUserId)
         {
-            return caffFileRepository.Query(caffFile => caffFile.Owner == userId);
+            return caffFileRepository.Query(caffFile => caffFile.Owner == askingUserId);
         }
 
         public string UpdateCaffFile(CaffFile updatedCaffFile, string userId)

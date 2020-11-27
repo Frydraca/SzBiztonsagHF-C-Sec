@@ -56,6 +56,20 @@ export class FetchDataComponent {
         },
         status: "blue",
       },
+      {
+        name: "Create Caff File Test",
+        action: () => {
+          this.createCaffTest("Create Caff File Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Get All Caff Files Test",
+        action: () => {
+          this.getAllCaffTest("Get All Caff Files Test");
+        },
+        status: "blue",
+      },
     ];
   }
 
@@ -206,6 +220,48 @@ export class FetchDataComponent {
           this.testList.find((t) => t.name == name).status = "red";
         }
       );
+  };
+
+  createCaffTest = (name: string) => {
+    axios({
+      method: "POST",
+      url: this.baseURL + "caff",
+      headers: this.header,
+      data: {
+        name: "kacsa.caff",
+        comments: [
+          { text: "A kacsak nagyon fura allatok!" },
+          { text: "A kacsa pucsi haha!" },
+          { text: "A kacsak mesék!" },
+        ],
+      },
+    }).then(
+      (success) => {
+        console.log(success.data);
+        this.testList.find((t) => t.name == name).status = "green";
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  getAllCaffTest = (name: string) => {
+    axios({
+      method: "GET",
+      url: this.baseURL + "caff/all",
+      headers: this.header,
+    }).then(
+      (success) => {
+        console.log(success.data);
+        this.testList.find((t) => t.name == name).status = "green";
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
   };
 
   generateAuthenticationHeadder = () => {
