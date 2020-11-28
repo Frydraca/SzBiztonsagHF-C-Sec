@@ -7,6 +7,7 @@ import {UserDataResponse} from '../models/user-data-response';
 import {RegisterData} from '../models/register-data';
 import {RegisterResponse} from '../models/register-response';
 import {map} from 'rxjs/operators';
+import {CaffImage} from '../models/caff-image';
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +53,18 @@ export class HttpService {
         loginResponse => this.handleLoginResponse(loginResponse),
         error => this.handleLoginError(error)
       ));
+  }
+
+  public addComment(imageId: string, comment: { text: string }): Observable<any> {
+    return this.postRequest<any>(`caff/${imageId}/comments`, comment);
+  }
+
+  public deleteComment(imageId: string, commentId: string): Observable<any> {
+    return this.deleteRequest<any>(imageId + '/comments/' + commentId);
+  }
+
+  public getImageById(imageId: string): Observable<CaffImage> {
+    return this.getRequest<CaffImage>('caff/' + imageId);
   }
 
   public getUserData(): Observable<UserDataResponse> {

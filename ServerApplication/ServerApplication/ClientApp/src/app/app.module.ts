@@ -44,7 +44,7 @@ import {UserDetailsComponent} from './components/user-details/user-details.compo
       {path: 'login', component: LoginRegisterComponent},
       {path: 'user-details/:id', component: UserDetailsComponent},
       {path: 'user-details', component: UserDetailsComponent},
-      {path: 'details', component: DetailsComponent, canActivate: [AuthGuard]},
+      {path: 'details/:imageid', component: DetailsComponent, canActivate: [AuthGuard]},
       {path: 'admin', component: AdminComponent, canActivate: [AuthGuard]},
     ]),
     ReactiveFormsModule,
