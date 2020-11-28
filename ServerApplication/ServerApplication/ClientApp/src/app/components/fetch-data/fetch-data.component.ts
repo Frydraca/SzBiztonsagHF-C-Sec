@@ -851,30 +851,43 @@ export class FetchDataComponent {
 
   uploadCaffTest = (name: string) => {
     var formData = new FormData();
-    formData.append("caffFile", this.fileToUpload,  this.fileToUpload.name)
+    formData.append("caffFile", this.fileToUpload, this.fileToUpload.name);
     axios({
       method: "POST",
-      headers: {...this.header, 'Content-Type': 'multipart/form-data'},
-      url: this.baseURL + "caff/" + "alma",
-      data: formData
+      url: this.baseURL + "caff",
+      headers: this.header,
+      data: {
+        name: "kacsa.caff",
+        comments: [],
+      },
     }).then(
-      (success) => {
-        console.log(success.data);
-        this.testList.find((t) => t.name == name).status = "green";
+      (successPost) => {
+        axios({
+          method: "POST",
+          headers: { ...this.header, "Content-Type": "multipart/form-data" },
+          url: this.baseURL + "caff/" + successPost.data.id,
+          data: formData,
+        }).then(
+          (success) => {
+            console.log(success.data);
+            this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
       },
       (error) => {
         console.log(error.response.data.error);
         this.testList.find((t) => t.name == name).status = "red";
       }
     );
-
   };
 
   handleFileInput = (files: FileList) => {
     this.fileToUpload = files[0];
-  }
-
-
+  };
 
   generateAuthenticationHeadder = () => {
     axios

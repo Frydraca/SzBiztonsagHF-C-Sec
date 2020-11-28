@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace ServerApplication.BLL.Services.Interfaces
 {
@@ -14,6 +15,7 @@ namespace ServerApplication.BLL.Services.Interfaces
         public IEnumerable<CaffFile> GetOwnCaffFiles(string askingUserId);
         public Task<CaffFile> ReturnCaffFile(string caffFileId, string askingUserId);
         public Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId);
+        public string UploadCaffFile(string caffId, IFormFile file);
         public Task<string> DeleteCaffFile(string caffFileId, string askingUserId);
         public string CreateNewComment(Comment newComment, string parentCaffId, string askingUserId);
         public Comment GetComment(string commentId, string parentCaffId);

@@ -72,24 +72,25 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpPost("{caffId}"), DisableRequestSizeLimit]
-        public ActionResult<CaffFileIdData> UploadCaffFile(string caffId)
+        public async Task<ActionResult<CaffFileIdData>> UploadCaffFile(string caffId)
         {
-            var file = Request.Form.Files[0];
-            var folderName = Path.Combine("Resources", "CAFFFiles");
-            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            if (file.Length > 0)
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
             {
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                var fullPath = Path.Combine(pathToSave, fileName);
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                await authService.CheckIfUserIsLoggedIn(userId);
+
+                var file = Request.Form.Files[0];
+                var id = caffService.UploadCaffFile(caffId, file);
+
+                return new CaffFileIdData()
                 {
-                    file.CopyTo(stream);
-                }
+                    Id = caffId
+                };
             }
-            return new CaffFileIdData()
+            catch (Exception e)
             {
-                Id = caffId
-            };
+                return BadRequest(new { error = e.Message });
+            }
         }
 
         [HttpGet("{caffId}")]

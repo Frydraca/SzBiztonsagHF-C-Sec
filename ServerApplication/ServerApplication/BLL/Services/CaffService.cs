@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
@@ -7,7 +8,9 @@ using ServerApplication.BLL.RepositoryInterfaces;
 using ServerApplication.BLL.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace ServerApplication.BLL.Services
@@ -95,6 +98,33 @@ namespace ServerApplication.BLL.Services
             }
 
             throw new Exception("Couldn't update this caff file!");
+        }
+
+        public string UploadCaffFile(string caffId, IFormFile file)
+        {
+            var folderName = Path.Combine("Resources", "CAFFFiles");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            CaffFile caffFile = FindExistingCaffFile(caffId);
+            if (file.Length > 0)
+            {
+                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                var fullPath = Path.Combine(pathToSave, fileName);
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+                caffFile.FilePath = fullPath;
+            }
+            else
+            {
+                throw new Exception("File was empty!");
+            }
+
+            if (caffFileRepository.Update(caffFile))
+            {
+                return caffId;
+            }
+            throw new Exception("Couldn't save the filepath of the uploaded file!");
         }
 
         public async Task<string> DeleteCaffFile(string caffFileId, string askingUserId)
@@ -220,5 +250,7 @@ namespace ServerApplication.BLL.Services
 
             return comment.Owner == askingUser.Id || askingUser.IsAdmin;
         }
+
+
     }
 }
