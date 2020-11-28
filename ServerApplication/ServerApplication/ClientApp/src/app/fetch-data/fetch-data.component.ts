@@ -84,6 +84,20 @@ export class FetchDataComponent {
         },
         status: "blue",
       },
+      {
+        name: "Update Caff File Test",
+        action: () => {
+          this.updateCaffById("Update Caff File Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Delete Caff File Test",
+        action: () => {
+          this.deleteCaffByIdTest("Delete Caff File Test");
+        },
+        status: "blue",
+      },
     ];
   }
 
@@ -366,6 +380,102 @@ export class FetchDataComponent {
             this.testList.find((t) => t.name == name).status = "red";
           }
         )
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  updateCaffById = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "madár.caff",
+        comments: [
+          { text: "A madár az ász!" },
+          { text: "Sas!" },
+        ],
+      } 
+    })
+    .then(
+      (successfullpost) => {
+        axios({
+          method: "PUT",
+          headers: this.header,
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+          data: {
+            name: "madár.caff",
+            comments: [
+              { text: "A madár az ász!" },
+              { text: "Sólyom" },
+              { text: "tojás" },
+            ],
+          } 
+        })
+        .then(
+          (successfullupdate) => {
+            axios({
+              method: "GET",
+              url: this.baseURL + "caff/" + successfullupdate.data.id,
+              headers: this.header,
+            })
+            .then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        )
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  deleteCaffByIdTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "dino.caff",
+        comments: [
+          { text: "T-rex!" },
+          { text: "Diiiiiiiiiino!" },
+        ],
+      } 
+    })
+    .then(
+      (successfullpost) => {
+        axios({
+          method: "DELETE",
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+          headers: this.header,
+        }).then(
+          (success) => {
+            console.log(success.data);
+            this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
       },
       (error) => {
         console.log(error.response.data.error);
