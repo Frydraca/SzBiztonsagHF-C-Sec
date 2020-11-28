@@ -12,5 +12,7 @@ namespace ServerApplication.API.DTOs.Auth
         public long TokenExpirationTime { get; set; }
 
         public string Id { get; set; }
+
+        public bool IsAdmin { get; set; }
     }
 }

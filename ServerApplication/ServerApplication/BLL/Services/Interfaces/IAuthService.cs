@@ -11,6 +11,6 @@ namespace ServerApplication.BLL.Services.Interfaces
 
         public Task<Guid> LogInUser(Login login);
 
-        public AuthData GetAuthdata(Guid id);
+        public Task<AuthData> GetAuthdata(Guid id);
     }
 }

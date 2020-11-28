@@ -49,7 +49,7 @@ namespace ServerApplication.BLL.Services
             throw new Exception("Password and RepeatedPassword doesn't match!");
         }
 
-        public AuthData GetAuthdata(Guid id)
+        public async Task<AuthData> GetAuthdata(Guid id)
         {
             var expirationTime = DateTime.UtcNow.AddDays(jwtLifespan);
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -67,11 +67,14 @@ namespace ServerApplication.BLL.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
 
+            var user = await userManager.FindByIdAsync(id.ToString());
+
             return new AuthData
             {
                 Token = token,
                 TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds(),
-                Id = id.ToString()
+                Id = id.ToString(),
+                IsAdmin = user.IsAdmin
             };
         }
 

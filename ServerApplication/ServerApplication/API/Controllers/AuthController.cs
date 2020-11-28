@@ -30,7 +30,7 @@ namespace ServerApplication.API.Controllers
             try
             {
                 var id = await authService.LogInUser(mapper.Map<Login>(model));
-                return authService.GetAuthdata(id);
+                return await authService.GetAuthdata(id);
             }
             catch (Exception e)
             {
@@ -47,7 +47,7 @@ namespace ServerApplication.API.Controllers
             {
                 var id = await authService.CreateNewUser(mapper.Map<Registration>(model));
 
-                return authService.GetAuthdata(id);
+                return await authService.GetAuthdata(id);
             }
             catch (Exception e)
             {
