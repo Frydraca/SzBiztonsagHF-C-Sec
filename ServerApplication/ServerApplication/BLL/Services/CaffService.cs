@@ -149,9 +149,9 @@ namespace ServerApplication.BLL.Services
         public async Task<string> UpdateComment(Comment updatedComment, string parentCaffId, string askingUserId)
         {
             var askingUser = await userManager.FindByIdAsync(askingUserId);
-            if (!hasAccessToCaffFile(parentCaffId, askingUser))
+            if (!hasAccessToComment(parentCaffId, updatedComment.Id, askingUser))
             {
-                throw new Exception("You have no access to this caff file!");
+                throw new Exception("You have no access to this comment!");
             }
             CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
@@ -175,9 +175,9 @@ namespace ServerApplication.BLL.Services
         public async Task<string> DeleteComment(string commentId, string parentCaffId, string askingUserId)
         {
             var askingUser = await userManager.FindByIdAsync(askingUserId);
-            if (!hasAccessToCaffFile(parentCaffId, askingUser))
+            if (!hasAccessToCaffFile(parentCaffId, askingUser) && !hasAccessToComment(parentCaffId, commentId, askingUser))
             {
-                throw new Exception("You have no access to this caff file!");
+                throw new Exception("You have no access to this comment!");
             }
             CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
@@ -211,6 +211,14 @@ namespace ServerApplication.BLL.Services
             var caffFile = caffFileRepository.Find(caffFileId);
 
             return caffFile.Owner == askingUser.Id || askingUser.IsAdmin;
+        }
+
+        private bool hasAccessToComment(string caffFileId, string commentId, User askingUser)
+        {
+            var caffFile = caffFileRepository.Find(caffFileId);
+            var comment = caffFile.Comments.Find(c => c.Id == commentId);
+
+            return comment.Owner == askingUser.Id || askingUser.IsAdmin;
         }
     }
 }
