@@ -1,11 +1,12 @@
 import {Inject, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {LoginData} from '../models/login-data';
-import {Observable} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {LoginResponse} from '../models/login-response';
 import {UserDataResponse} from '../models/user-data-response';
 import {RegisterData} from '../models/register-data';
 import {RegisterResponse} from '../models/register-response';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,8 @@ export class HttpService {
 
   private readonly baseUrl: string;
   private header;
+  private token: string;
+  private tokenExpirationTime: number;
 
   constructor(
     @Inject('BASE_URL') baseUrl: string,
@@ -21,10 +24,14 @@ export class HttpService {
     this.baseUrl = baseUrl;
   }
 
-  public setHeader(token: string): void {
+  public setHeader(token: string, tokenExpirationTime: number): void {
+    this.token = token;
+    this.tokenExpirationTime = tokenExpirationTime;
     this.header = {
       Authorization: 'Bearer ' + token,
     };
+
+    this.sendKeepAlive();
   }
 
   public register(registerData: RegisterData): Observable<RegisterResponse> {
@@ -32,12 +39,19 @@ export class HttpService {
   }
 
   public logout(): Observable<void> {
-    this.header = null;
-    return this.getRequest<void>('auth/logout');
+    const logoutObservable = this.postRequest<void>('auth/logout', null);
+
+    this.clearToken();
+
+    return logoutObservable;
   }
 
   public login(loginData: LoginData): Observable<LoginResponse> {
-    return this.postRequest<LoginResponse>('auth/login', loginData);
+    return this.postRequest<LoginResponse>('auth/login', loginData).pipe(
+      map(
+        loginResponse => this.handleLoginResponse(loginResponse),
+        error => this.handleLoginError(error)
+      ));
   }
 
   public getUserData(): Observable<UserDataResponse> {
@@ -46,6 +60,10 @@ export class HttpService {
 
   public getAllUser(): Observable<any> {
     return this.getRequest<any>('usermanagement/all');
+  }
+
+  private refreshJwt(): Observable<LoginResponse> {
+    return this.postRequest<LoginResponse>('auth/refresh-jwt', null);
   }
 
   private getRequest<T>(urlEnd: string): Observable<T> {
@@ -68,5 +86,39 @@ export class HttpService {
     return {
       headers: this.header
     };
+  }
+
+  private handleLoginResponse(loginResponse: LoginResponse): LoginResponse {
+    this.setHeader(loginResponse.token, loginResponse.tokenExpirationTime);
+    return loginResponse;
+  }
+
+  private sendKeepAlive(): void {
+    const tokenRefreshOffset = (this.tokenExpirationTime - 2) * 1000;
+    setTimeout(() => this.keepAlive(), tokenRefreshOffset);
+  }
+
+  private keepAlive(): void {
+    if (this.token && this.token.length > 0) {
+      this.refreshJwt().subscribe(
+        refreshResponse => this.handleLoginResponse(refreshResponse),
+        error => this.handleJwtError(error)
+      );
+    }
+  }
+
+  private handleJwtError(error: HttpErrorResponse): void {
+    this.clearToken();
+  }
+
+  private handleLoginError(error: HttpErrorResponse): void {
+    this.handleJwtError(error);
+    throwError(error);
+  }
+
+  private clearToken(): void {
+    this.header = null;
+    this.token = null;
+    this.tokenExpirationTime = null;
   }
 }

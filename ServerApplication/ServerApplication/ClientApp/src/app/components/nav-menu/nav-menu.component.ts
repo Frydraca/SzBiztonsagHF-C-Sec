@@ -14,7 +14,6 @@ export class NavMenuComponent {
   constructor(
     private httpService: HttpService,
     private userService: UserService) {
-
   }
 
 

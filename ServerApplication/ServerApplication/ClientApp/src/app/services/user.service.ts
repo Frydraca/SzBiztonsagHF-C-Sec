@@ -10,13 +10,24 @@ export class UserService {
 
   private loggedInUser: User;
   private isUserLoggedIn = false;
+  private isUserAdmin = false;
 
   constructor(private httpService: HttpService) {
     this.loggedInUser = new User();
   }
 
+  public setRole(isAdmin: boolean): void {
+    if (isAdmin) {
+      this.isUserAdmin = true;
+    }
+  }
+
   public isAuthenticated(): boolean {
     return this.isUserLoggedIn;
+  }
+
+  public isAdmin(): boolean {
+    return this.isUserAdmin;
   }
 
   public setLoggedInUser(userData: UserDataResponse): void {
@@ -27,5 +38,6 @@ export class UserService {
   public logout(): void {
     this.loggedInUser = new User();
     this.isUserLoggedIn = false;
+    this.isUserAdmin = false;
   }
 }

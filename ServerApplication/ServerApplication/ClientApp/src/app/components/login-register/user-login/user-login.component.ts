@@ -5,6 +5,7 @@ import {LoginResponse} from '../../../models/login-response';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDataResponse} from '../../../models/user-data-response';
 import {UserService} from '../../../services/user.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-user-login',
@@ -16,6 +17,7 @@ export class UserLoginComponent implements OnInit {
   public loginFormGroup: FormGroup;
 
   constructor(
+    private router: Router,
     private userService: UserService,
     private httpService: HttpService) {
   }
@@ -37,7 +39,6 @@ export class UserLoginComponent implements OnInit {
   }
 
   private handleLoginResponse(loginResponse: LoginResponse): void {
-    this.httpService.setHeader(loginResponse.token);
     this.httpService.getUserData().subscribe(
       userDataResponse => this.handleGetUserResponse(userDataResponse),
       error => this.handleGetUserError(error)
@@ -50,6 +51,7 @@ export class UserLoginComponent implements OnInit {
 
   private handleGetUserResponse(userDataResponse: UserDataResponse): void {
     this.userService.setLoggedInUser(userDataResponse);
+    this.router.navigate(['/']).then().catch();
   }
 
   private handleGetUserError(loginError: HttpErrorResponse): void {
