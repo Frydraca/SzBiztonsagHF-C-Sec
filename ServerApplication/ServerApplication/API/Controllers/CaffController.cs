@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerApplication.API.DTOs.CaffFile;
+using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
 using ServerApplication.BLL.Services.Interfaces;
 using System;
@@ -69,7 +70,7 @@ namespace ServerApplication.API.Controllers
 
             try
             {
-                var caffFile = caffService.GetCaffFile(caffId, userId);
+                var caffFile = caffService.ReturnCaffFile(caffId, userId);
                 return mapper.Map<CaffFileData>(caffFile);
             }
             catch (Exception e)
@@ -92,5 +93,24 @@ namespace ServerApplication.API.Controllers
             }
         }
 
+
+        [HttpPost("{id}/create")]
+        public ActionResult<CommentIdData> PostComment([FromBody] CommentData model, string caffId)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var commentId = caffService.CreateNewComment(mapper.Map<Comment>(model), caffId);
+                return new CommentIdData()
+                {
+                    Id = commentId
+                };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
     }
 }

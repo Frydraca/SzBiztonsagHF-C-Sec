@@ -1,6 +1,8 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
 using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
+using ServerApplication.BLL.Models.User.DB;
 using ServerApplication.BLL.RepositoryInterfaces;
 using ServerApplication.BLL.Services.Interfaces;
 using System;
@@ -13,10 +15,12 @@ namespace ServerApplication.BLL.Services
     public class CaffService : ICaffService
     {
         private ICaffFileRepository caffFileRepository;
+        UserManager<User> userManager;
 
-        public CaffService(ICaffFileRepository caffFileRepository)
+        public CaffService(ICaffFileRepository caffFileRepository, UserManager<User> userManager)
         {
             this.caffFileRepository = caffFileRepository;
+            this.userManager = userManager;
         }
 
         public string CreateNewCaffFile(CaffFile newCaffFile, string askingUserId)
@@ -48,9 +52,10 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.QueryAll();
         }
 
-        public CaffFile GetCaffFile(string caffFileId, string askingUserId)
+        public async Task<CaffFile> ReturnCaffFile(string caffFileId, string askingUserId)
         {
-            if (!hasAccessToCaffFile(caffFileId, askingUserId))
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToCaffFile(caffFileId, askingUser))
             {
                 throw new Exception("You have no access to this caff file!");
             }
@@ -63,9 +68,10 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.Query(caffFile => caffFile.Owner == askingUserId);
         }
 
-        public string UpdateCaffFile(CaffFile updatedCaffFile, string userId)
+        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId)
         {
-            if (!hasAccessToCaffFile(updatedCaffFile.Id, userId))
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToCaffFile(updatedCaffFile.Id, askingUser))
             {
                 throw new Exception("You have no access to this caff file!");
             }
@@ -77,9 +83,10 @@ namespace ServerApplication.BLL.Services
             throw new Exception("Couldn't update this caff file!");
         }
 
-        public string DeleteCaffFile(string caffFileId, string userId)
+        public async Task<string> DeleteCaffFile(string caffFileId, string askingUserId)
         {
-            if (!hasAccessToCaffFile(caffFileId, userId))
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToCaffFile(caffFileId, askingUser))
             {
                 throw new Exception("You have no access to this caff file!");
             }
@@ -93,33 +100,87 @@ namespace ServerApplication.BLL.Services
 
         public string CreateNewComment(Comment newComment, string parentCaffId)
         {
-            throw new NotImplementedException();
+            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+
+            parentCaffFile.Comments.Add(newComment);
+            if (caffFileRepository.Update(parentCaffFile))
+            {
+                return newComment.Id;
+            }
+            throw new Exception("Couldn't add the comment to the caff file!");
+
         }
 
-        public Comment GetComment(string commentId, string userId)
+        public Comment GetComment(string commentId, string parentCaffId)
         {
-            throw new NotImplementedException();
+            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+
+            Comment requestedComment = parentCaffFile.Comments.Find(c => c.Id == commentId);
+            if(requestedComment == null)
+            {
+                throw new Exception("Couldn't find the requested comment!");
+            }
+            return requestedComment;
         }
 
         public IEnumerable<Comment> GetCommentsOfCaffFile(string parentCaffId)
         {
-            throw new NotImplementedException();
+            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+
+            return parentCaffFile.Comments;
         }
 
-        public string UpdateComment(Comment updatedComment, string userId)
+        public async Task<string> UpdateComment(Comment updatedComment, string parentCaffId, string askingUserId)
         {
-            throw new NotImplementedException();
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToCaffFile(parentCaffId, askingUser))
+            {
+                throw new Exception("You have no access to this caff file!");
+            }
+            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+
+            Comment oldComment = parentCaffFile.Comments.Find(c => c.Id == updatedComment.Id);
+            if (oldComment == null)
+            {
+                throw new Exception("Couldn't find the comment to update!");
+            }
+            parentCaffFile.Comments.Remove(oldComment);
+            parentCaffFile.Comments.Add(updatedComment);
+            return updatedComment.Id;
         }
-        public string DeleteComment(string commentId, string userId)
+        public async Task<string> DeleteComment(string commentId, string parentCaffId, string askingUserId)
         {
-            throw new NotImplementedException();
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToCaffFile(parentCaffId, askingUser))
+            {
+                throw new Exception("You have no access to this caff file!");
+            }
+            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+
+            Comment oldComment = parentCaffFile.Comments.Find(c => c.Id == commentId);
+            if (oldComment == null)
+            {
+                throw new Exception("Couldn't find the comment to delete!");
+            }
+            parentCaffFile.Comments.Remove(oldComment);
+            return commentId;
         }
 
-        private bool hasAccessToCaffFile(string caffFileId, string userId)
+        private CaffFile GetCaffFile(string caffFileId)
+        {
+            CaffFile caffFile = caffFileRepository.Find(caffFileId);
+            if (caffFile == null)
+            {
+                throw new Exception("Couldn't find the requested caff file!");
+            }
+            return caffFile;
+        }
+
+        private bool hasAccessToCaffFile(string caffFileId, User askingUser)
         {
             var caffFile = caffFileRepository.Find(caffFileId);
 
-            return caffFile.Owner == userId;
+            return caffFile.Owner == askingUser.Id || askingUser.IsAdmin;
         }
     }
 }
