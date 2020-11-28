@@ -131,14 +131,15 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpPost("{caffId}/create")]
+        [HttpPost("{caffId}/comments")]
         public ActionResult<CommentIdData> PostComment([FromBody] CommentData model, string caffId)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
-                var commentId = caffService.CreateNewComment(mapper.Map<Comment>(model), caffId);
+                var commentId = caffService.CreateNewComment(mapper.Map<Comment>(model), caffId, userId);
                 return new CommentIdData()
                 {
                     Id = commentId
@@ -150,7 +151,7 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpGet("{caffId}/{commentId}")]
+        [HttpGet("{caffId}/comments/{commentId}")]
         public ActionResult<CommentData> GetComment(string caffId, string commentId)
         {
             try
@@ -178,7 +179,7 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpPut("{caffId}")]
+        [HttpPut("{caffId}/comments")]
         public async Task<ActionResult<CommentIdData>> UpdateComment([FromBody] CommentData model, string caffId)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -199,7 +200,7 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpDelete("{caffId}/{commentId}")]
+        [HttpDelete("{caffId}/comments/{commentId}")]
         public async Task<ActionResult<CommentIdData>> DeleteComment(string caffId, string commentId)
         {
             var userId = this.User.Claims.FirstOrDefault().Value;

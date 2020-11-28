@@ -112,10 +112,10 @@ namespace ServerApplication.BLL.Services
             throw new Exception("Couldn't delete this caff file!");
         }
 
-        public string CreateNewComment(Comment newComment, string parentCaffId)
+        public string CreateNewComment(Comment newComment, string parentCaffId, string askingUserId)
         {
             CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
-
+            newComment.Owner = askingUserId;
             parentCaffFile.Comments.Add(newComment);
             if (caffFileRepository.Update(parentCaffFile))
             {

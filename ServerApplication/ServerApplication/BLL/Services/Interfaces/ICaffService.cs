@@ -15,7 +15,7 @@ namespace ServerApplication.BLL.Services.Interfaces
         public Task<CaffFile> ReturnCaffFile(string caffFileId, string askingUserId);
         public Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId);
         public Task<string> DeleteCaffFile(string caffFileId, string askingUserId);
-        public string CreateNewComment(Comment newComment, string parentCaffId);
+        public string CreateNewComment(Comment newComment, string parentCaffId, string askingUserId);
         public Comment GetComment(string commentId, string parentCaffId);
         public IEnumerable<Comment> GetCommentsOfCaffFile(string parentCaffId);
         public Task<string> UpdateComment(Comment updatedComment, string parentCaffId, string askingUserId);
