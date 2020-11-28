@@ -71,6 +71,8 @@ namespace ServerApplication.BLL.Services
         public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId)
         {
             var askingUser = await userManager.FindByIdAsync(askingUserId);
+
+            CaffFile oldCaffFile = FindExistingCaffFile(updatedCaffFile.Id);
             if (!hasAccessToCaffFile(updatedCaffFile.Id, askingUser))
             {
                 throw new Exception("You have no access to this caff file!");
