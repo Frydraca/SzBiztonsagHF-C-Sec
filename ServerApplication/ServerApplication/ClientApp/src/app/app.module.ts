@@ -1,6 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {RouterModule} from '@angular/router';
 
@@ -11,6 +11,10 @@ import {FetchDataComponent} from './fetch-data/fetch-data.component';
 import {LoginRegisterComponent} from './login-register/login-register.component';
 import {AdminComponent} from './admin/admin.component';
 import {DetailsComponent} from './details/details.component';
+import { UserLoginComponent } from './login-register/user-login/user-login.component';
+import { UserRegisterComponent } from './login-register/user-register/user-register.component';
+import {UserService} from './user.service';
+import {HttpService} from './http.service';
 
 @NgModule({
   declarations: [
@@ -20,7 +24,9 @@ import {DetailsComponent} from './details/details.component';
     FetchDataComponent,
     LoginRegisterComponent,
     AdminComponent,
-    DetailsComponent
+    DetailsComponent,
+    UserLoginComponent,
+    UserRegisterComponent
   ],
   imports: [
     BrowserModule.withServerTransition({appId: 'ng-cli-universal'}),
@@ -32,9 +38,13 @@ import {DetailsComponent} from './details/details.component';
       {path: 'login', component: LoginRegisterComponent},
       {path: 'details', component: DetailsComponent},
       {path: 'admin', component: AdminComponent},
-    ])
+    ]),
+    ReactiveFormsModule
   ],
-  providers: [],
+  providers: [
+    HttpService,
+    UserService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
