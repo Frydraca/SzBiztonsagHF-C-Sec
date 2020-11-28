@@ -68,19 +68,27 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.Query(caffFile => caffFile.Owner == askingUserId);
         }
 
-        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile,string caffFileId, string askingUserId)
+        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile,  string askingUserId)
         {
             var askingUser = await userManager.FindByIdAsync(askingUserId);
 
-            if (!hasAccessToCaffFile(caffFileId, askingUser))
+            if (!hasAccessToCaffFile(updatedCaffFile.Id, askingUser))
             {
                 throw new Exception("You have no access to this caff file!");
             }
-
-            CaffFile oldCaffFile = FindExistingCaffFile(caffFileId);
-            updatedCaffFile.Id = oldCaffFile.Id;
+            CaffFile oldCaffFile = FindExistingCaffFile(updatedCaffFile.Id);
             updatedCaffFile.FilePath = oldCaffFile.FilePath;
             updatedCaffFile.Owner = oldCaffFile.Owner;
+            updatedCaffFile.CreationDate = oldCaffFile.CreationDate;
+            updatedCaffFile.Comments.Where(c => !oldCaffFile.Comments.Any(oc => oc.Text == c.Text))
+                                    .ToList()
+                                    .ForEach(c => { c.CreationDate = DateTime.Now; });
+            updatedCaffFile.Comments.Where(c => !oldCaffFile.Comments.Any(oc => oc.Text == c.Text))
+                                    .ToList()
+                                    .ForEach(c => { c.Owner = askingUserId; });
+            updatedCaffFile.Comments.Where(c => oldCaffFile.Comments.Any(oc => oc.Text == c.Text))
+                                    .ToList()
+                                    .ForEach(c => { c.Owner = oldCaffFile.Comments.Find(oc => oc.Id == c.Id).Owner; });
             if (caffFileRepository.Update(updatedCaffFile))
             {
                 return updatedCaffFile.Id;
@@ -150,6 +158,8 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("Couldn't find the comment to update!");
             }
+            updatedComment.Owner = oldComment.Owner;
+            updatedComment.CreationDate = DateTime.Now;
             parentCaffFile.Comments.Remove(oldComment);
             parentCaffFile.Comments.Add(updatedComment);
             return updatedComment.Id;

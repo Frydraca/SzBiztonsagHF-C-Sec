@@ -304,9 +304,8 @@ export class FetchDataComponent {
           { text: "A medve alszik!" },
           { text: "A medve mesék!" },
         ],
-      } 
-    })
-    .then(
+      },
+    }).then(
       (successfullpost) => {
         axios({
           method: "GET",
@@ -337,13 +336,9 @@ export class FetchDataComponent {
       url: this.baseURL + "caff",
       data: {
         name: "kutya.caff",
-        comments: [
-          { text: "Kutyák!" },
-          { text: "Dogs" },
-        ],
-      } 
-    })
-    .then(
+        comments: [{ text: "Kutyák!" }, { text: "Dogs" }],
+      },
+    }).then(
       () => {
         axios({
           method: "POST",
@@ -351,20 +346,15 @@ export class FetchDataComponent {
           url: this.baseURL + "caff",
           data: {
             name: "cica.caff",
-            comments: [
-              { text: "Yuuumiiiii!" },
-              { text: "cicccc" },
-            ],
-          } 
-        })
-        .then(
+            comments: [{ text: "Yuuumiiiii!" }, { text: "cicccc" }],
+          },
+        }).then(
           () => {
             axios({
               method: "GET",
               url: this.baseURL + "caff",
               headers: this.header,
-            })
-            .then(
+            }).then(
               (success) => {
                 console.log(success.data);
                 this.testList.find((t) => t.name == name).status = "green";
@@ -379,7 +369,7 @@ export class FetchDataComponent {
             console.log(error.response.data.error);
             this.testList.find((t) => t.name == name).status = "red";
           }
-        )
+        );
       },
       (error) => {
         console.log(error.response.data.error);
@@ -395,35 +385,31 @@ export class FetchDataComponent {
       url: this.baseURL + "caff",
       data: {
         name: "madár.caff",
-        comments: [
-          { text: "A madár az ász!" },
-          { text: "Sas!" },
-        ],
-      } 
-    })
-    .then(
+        comments: [{ text: "A madár az ász!" }, { text: "Sas!" }],
+      },
+    }).then(
       (successfullpost) => {
         axios({
-          method: "PUT",
+          method: "GET",
           headers: this.header,
           url: this.baseURL + "caff/" + successfullpost.data.id,
-          data: {
-            name: "madár.caff",
-            comments: [
-              { text: "A madár az ász!" },
-              { text: "Sólyom" },
-              { text: "tojás" },
-            ],
-          } 
-        })
-        .then(
-          (successfullupdate) => {
+        }).then(
+          (successFullget) => {
+            successFullget.data.comments[0] = {
+              ...successFullget.data.comments[0],
+              text: "alma",
+            };
             axios({
-              method: "GET",
-              url: this.baseURL + "caff/" + successfullupdate.data.id,
+              method: "PUT",
               headers: this.header,
-            })
-            .then(
+              url: this.baseURL + "caff",
+              data: {
+                id: successFullget.data.id,
+                name: successFullget.data.name,
+                creationDate: successFullget.data.creationDate,
+                comments: successFullget.data.comments,
+              },
+            }).then(
               (success) => {
                 console.log(success.data);
                 this.testList.find((t) => t.name == name).status = "green";
@@ -438,7 +424,7 @@ export class FetchDataComponent {
             console.log(error.response.data.error);
             this.testList.find((t) => t.name == name).status = "red";
           }
-        )
+        );
       },
       (error) => {
         console.log(error.response.data.error);
@@ -454,13 +440,9 @@ export class FetchDataComponent {
       url: this.baseURL + "caff",
       data: {
         name: "dino.caff",
-        comments: [
-          { text: "T-rex!" },
-          { text: "Diiiiiiiiiino!" },
-        ],
-      } 
-    })
-    .then(
+        comments: [{ text: "T-rex!" }, { text: "Diiiiiiiiiino!" }],
+      },
+    }).then(
       (successfullpost) => {
         axios({
           method: "DELETE",
@@ -483,8 +465,6 @@ export class FetchDataComponent {
       }
     );
   };
-
-
 
   generateAuthenticationHeadder = () => {
     axios

@@ -93,15 +93,15 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpPut("{caffid}")]
-        public async Task<ActionResult<CaffFileIdData>> UpdateCaffFile([FromBody] CaffFileData model, string caffId)
+        [HttpPut]
+        public async Task<ActionResult<CaffFileIdData>> UpdateCaffFile([FromBody] CaffFileData model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
-                var caffFileId = await caffService.UpdateCaffFile(mapper.Map<CaffFile>(model), caffId, userId);
+                var caffFileId = await caffService.UpdateCaffFile(mapper.Map<CaffFile>(model), userId);
                 return new CaffFileIdData()
                 {
                     Id = caffFileId
@@ -116,8 +116,6 @@ namespace ServerApplication.API.Controllers
         [HttpDelete("{caffid}")]
         public async Task<ActionResult<CaffFileIdData>> DeleteCaffFile(string caffId)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
@@ -145,6 +143,74 @@ namespace ServerApplication.API.Controllers
                 {
                     Id = commentId
                 };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpGet("{caffId}/{commentId}")]
+        public ActionResult<CommentData> GetComment(string caffId, string commentId)
+        {
+            try
+            {
+                var comment = caffService.GetComment(commentId, caffId);
+                return mapper.Map<CommentData>(comment);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpGet("{caffId}/comments")]
+        public ActionResult<List<CommentData>> GetCommentsOfCaffFile(string caffId)
+        {
+            try
+            {
+                var comments = caffService.GetCommentsOfCaffFile(caffId);
+                return comments.Select(c => mapper.Map<CommentData>(c)).ToList();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpPut("{caffId}")]
+        public async Task<ActionResult<CommentIdData>> UpdateComment([FromBody] CommentData model, string caffId)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = this.User.Claims.FirstOrDefault().Value;
+
+            try
+            {
+                var updatedCommentId = await caffService.UpdateComment(mapper.Map<Comment>(model), caffId, userId);
+                return new CommentIdData()
+                {
+                    Id = updatedCommentId
+                }; ;
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpDelete("{caffId}/{commentId}")]
+        public async Task<ActionResult<CommentIdData>> DeleteComment(string caffId, string commentId)
+        {
+            var userId = this.User.Claims.FirstOrDefault().Value;
+
+            try
+            {
+                var deletedCommentId = await caffService.DeleteComment(commentId, caffId, userId);
+                return new CommentIdData()
+                {
+                    Id = deletedCommentId
+                }; ;
             }
             catch (Exception e)
             {
