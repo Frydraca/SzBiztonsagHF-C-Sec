@@ -166,7 +166,7 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpGet("{caffId}/comments")]
-        public ActionResult<List<CommentData>> GetCommentsOfCaffFile(string caffId)
+        public ActionResult<List<CommentData>> GetAllCommentsOfCaffFile(string caffId)
         {
             try
             {
