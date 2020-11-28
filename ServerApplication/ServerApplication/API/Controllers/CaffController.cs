@@ -18,22 +18,25 @@ namespace ServerApplication.API.Controllers
     [Route("[controller]")]
     public class CaffController : ControllerBase
     {
+        IAuthService authService;
         ICaffService caffService;
         IMapper mapper;
 
-        public CaffController(ICaffService caffService, IMapper mapper)
+        public CaffController(IAuthService authService, ICaffService caffService, IMapper mapper)
         {
+            this.authService = authService;
             this.caffService = caffService;
             this.mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<List<CaffFileData>> GetOwnCaffFiles()
+        public async Task<ActionResult<List<CaffFileData>>> GetOwnCaffFiles()
         {
             var userId = this.User.Claims.FirstOrDefault().Value;
 
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFiles = caffService.GetOwnCaffFiles(userId);
                 return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
             }
@@ -44,13 +47,14 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CaffFileIdData> PostCaffFile([FromBody] CaffFileData model)
+        public async Task<ActionResult<CaffFileIdData>> PostCaffFile([FromBody] CaffFileData model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFileId = caffService.CreateNewCaffFile(mapper.Map<CaffFile>(model), userId);
                 return new CaffFileIdData()
                 {
@@ -70,6 +74,7 @@ namespace ServerApplication.API.Controllers
 
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFile = await caffService.ReturnCaffFile(caffId, userId);
                 return mapper.Map<CaffFileData>(caffFile);
             }
@@ -80,10 +85,12 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpGet("all")]
-        public ActionResult<List<CaffFileData>> GetAllCaffFiles()
+        public async Task<ActionResult<List<CaffFileData>>> GetAllCaffFiles()
         {
+            var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFiles = caffService.GetAllCaffFiles();
                 return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
             }
@@ -101,6 +108,7 @@ namespace ServerApplication.API.Controllers
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFileId = await caffService.UpdateCaffFile(mapper.Map<CaffFile>(model), userId);
                 return new CaffFileIdData()
                 {
@@ -119,6 +127,7 @@ namespace ServerApplication.API.Controllers
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFileId = await caffService.DeleteCaffFile(caffId, userId);
                 return new CaffFileIdData()
                 {
@@ -132,13 +141,14 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpPost("{caffId}/comments")]
-        public ActionResult<CommentIdData> PostComment([FromBody] CommentData model, string caffId)
+        public async Task<ActionResult<CommentIdData>> PostComment([FromBody] CommentData model, string caffId)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var commentId = caffService.CreateNewComment(mapper.Map<Comment>(model), caffId, userId);
                 return new CommentIdData()
                 {
@@ -152,10 +162,12 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpGet("{caffId}/comments/{commentId}")]
-        public ActionResult<CommentData> GetComment(string caffId, string commentId)
+        public async Task<ActionResult<CommentData>> GetComment(string caffId, string commentId)
         {
+            var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var comment = caffService.GetComment(commentId, caffId);
                 return mapper.Map<CommentData>(comment);
             }
@@ -166,10 +178,12 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpGet("{caffId}/comments")]
-        public ActionResult<List<CommentData>> GetAllCommentsOfCaffFile(string caffId)
+        public async Task<ActionResult<List<CommentData>>> GetAllCommentsOfCaffFile(string caffId)
         {
+            var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var comments = caffService.GetCommentsOfCaffFile(caffId);
                 return comments.Select(c => mapper.Map<CommentData>(c)).ToList();
             }
@@ -188,6 +202,7 @@ namespace ServerApplication.API.Controllers
 
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var updatedCommentId = await caffService.UpdateComment(mapper.Map<Comment>(model), caffId, userId);
                 return new CommentIdData()
                 {
@@ -207,6 +222,7 @@ namespace ServerApplication.API.Controllers
 
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var deletedCommentId = await caffService.DeleteComment(commentId, caffId, userId);
                 return new CommentIdData()
                 {

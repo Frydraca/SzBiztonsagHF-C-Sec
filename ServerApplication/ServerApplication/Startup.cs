@@ -96,7 +96,7 @@ namespace ServerApplication
             services.AddSingleton<IAuthService>(
                 new AuthService(
                     Configuration.GetValue<string>("JwtKey"),
-                    Configuration.GetValue<int>("JwtExpiredays"),
+                    Configuration.GetValue<int>("JwtExpireSecs"),
                     userManager,
                     signInManager
                 )

@@ -18,11 +18,13 @@ namespace ServerApplication.API.Controllers
     [Route("[controller]")]
     public class UserManagementController : ControllerBase
     {
+        IAuthService authService;
         IUserManagementService userManagementService;
         IMapper mapper;
 
-        public UserManagementController(IMapper mapper, IUserManagementService userManagementService)
+        public UserManagementController(IMapper mapper, IAuthService authService, IUserManagementService userManagementService)
         {
+            this.authService = authService;
             this.userManagementService = userManagementService;
             this.mapper = mapper;
         }
@@ -31,8 +33,10 @@ namespace ServerApplication.API.Controllers
         public async Task<ActionResult<UserData>> GetAsync()
         {
             var userId = this.User.Claims.FirstOrDefault().Value;
+
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var user = await userManagementService.GetUser(userId);
 
                 return mapper.Map<UserData>(user);
@@ -49,6 +53,7 @@ namespace ServerApplication.API.Controllers
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var users = await userManagementService.GetAllUsers(userId);
 
                 return users.Select(mapper.Map<UserData>).ToList();
@@ -68,6 +73,7 @@ namespace ServerApplication.API.Controllers
             var targetUser = mapper.Map<User>(model);
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var result = await userManagementService.UpdateUser(targetUser, userId);
 
                 return new UserUpdateResponseData() { UpdatedUserId = result };
@@ -88,7 +94,28 @@ namespace ServerApplication.API.Controllers
             var changePassword = mapper.Map<ChangePassword>(model);
             try
             {
+                await authService.CheckIfUserIsLoggedIn(userId);
                 var result = await userManagementService.ChangeUserPassword(targetUser, userId, changePassword);
+
+                return new UserUpdateResponseData() { UpdatedUserId = result };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<UserUpdateResponseData>> DeleteUser([FromBody] UserData model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            var targetUser = mapper.Map<User>(model);
+            try
+            {
+                await authService.CheckIfUserIsLoggedIn(userId);
+                var result = await userManagementService.DeleteUser(targetUser, userId);
 
                 return new UserUpdateResponseData() { UpdatedUserId = result };
             }

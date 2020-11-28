@@ -59,7 +59,10 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this user!"); 
             }
-            
+
+            var oldUser = await userManager.FindByIdAsync(targetUser.Id);
+            targetUser.IsAdmin = oldUser.IsAdmin;
+            targetUser.IsLoggedIn = oldUser.IsLoggedIn;
             var result = await userManager.UpdateAsync(targetUser);
             if(result.Succeeded)
             {
@@ -87,6 +90,22 @@ namespace ServerApplication.BLL.Services
                 throw new Exception("You have no access to all the users!");
             }
             return userManager.Users.ToList();
+        }
+
+        public async Task<string> DeleteUser(User targetUser, string askingUserId)
+        {
+            var askingUser = await userManager.FindByIdAsync(askingUserId);
+            if (!hasAccessToUserData(targetUser, askingUser))
+            {
+                throw new Exception("You have no access to this user!");
+            }
+
+            var result = await userManager.DeleteAsync(targetUser);
+            if (result.Succeeded)
+            {
+                return targetUser.Id;
+            }
+            throw new Exception("Update was unsuccessfull!");
         }
 
         private bool hasAccessToUserData(User targetUser, User askingUser)

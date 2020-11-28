@@ -1,9 +1,11 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {LoginData} from './models/login-data';
+import {LoginData} from '../models/login-data';
 import {Observable} from 'rxjs';
-import {LoginResponse} from './models/login-response';
-import {UserDataResponse} from './models/user-data-response';
+import {LoginResponse} from '../models/login-response';
+import {UserDataResponse} from '../models/user-data-response';
+import {RegisterData} from '../models/register-data';
+import {RegisterResponse} from '../models/register-response';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +25,15 @@ export class HttpService {
     this.header = {
       Authorization: 'Bearer ' + token,
     };
+  }
+
+  public register(registerData: RegisterData): Observable<RegisterResponse> {
+    return this.postRequest<RegisterResponse>('auth/register', registerData);
+  }
+
+  public logout(): Observable<void> {
+    this.header = null;
+    return this.getRequest<void>('auth/logout');
   }
 
   public login(loginData: LoginData): Observable<LoginResponse> {

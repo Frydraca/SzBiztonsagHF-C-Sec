@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
-import {User} from './models/user';
-import {UserDataResponse} from './models/user-data-response';
+import {User} from '../models/user';
+import {UserDataResponse} from '../models/user-data-response';
+import {HttpService} from './http.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +11,12 @@ export class UserService {
   private loggedInUser: User;
   private isUserLoggedIn = false;
 
-  constructor() {
+  constructor(private httpService: HttpService) {
     this.loggedInUser = new User();
+  }
+
+  public isAuthenticated(): boolean {
+    return this.isUserLoggedIn;
   }
 
   public setLoggedInUser(userData: UserDataResponse): void {

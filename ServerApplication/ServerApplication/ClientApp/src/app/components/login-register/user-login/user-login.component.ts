@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {HttpService} from '../../http.service';
-import {LoginResponse} from '../../models/login-response';
+import {HttpService} from '../../../services/http.service';
+import {LoginResponse} from '../../../models/login-response';
 import {HttpErrorResponse} from '@angular/common/http';
-import {UserDataResponse} from '../../models/user-data-response';
-import {UserService} from '../../user.service';
+import {UserDataResponse} from '../../../models/user-data-response';
+import {UserService} from '../../../services/user.service';
 
 @Component({
   selector: 'app-user-login',

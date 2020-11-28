@@ -32,11 +32,19 @@ namespace ServerApplication.BLL.Services
 
         }
 
+        public async Task CheckIfUserIsLoggedIn(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            if(user.IsLoggedIn) return;
+            throw new Exception("User is not logged in!");
+        }
+
         public async Task<Guid> CreateNewUser(Registration registration)
         {
             if (registration.Password == registration.RepeatedPassword)
             {
-                var user = new User { UserName = registration.UserName, IsAdmin = false };
+                var user = new User { UserName = registration.UserName, IsAdmin = false, IsLoggedIn = true};
                 var result = await userManager.CreateAsync(user, registration.Password);
 
                 if (result.Succeeded)
@@ -51,7 +59,7 @@ namespace ServerApplication.BLL.Services
 
         public async Task<AuthData> GetAuthdata(Guid id)
         {
-            var expirationTime = DateTime.UtcNow.AddDays(jwtLifespan);
+            var expirationTime = DateTime.UtcNow.AddSeconds(jwtLifespan);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -72,10 +80,23 @@ namespace ServerApplication.BLL.Services
             return new AuthData
             {
                 Token = token,
-                TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds(),
+                TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds()-((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 Id = id.ToString(),
                 IsAdmin = user.IsAdmin
             };
+        }
+
+        public async Task<string> LogOutUser(string askingGuidId)
+        {
+            var user = await userManager.FindByIdAsync(askingGuidId);
+            user.IsLoggedIn = false;
+
+            var result = await userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return user.Id;
+            }
+            throw new Exception("Log out was unsuccessfull!");
         }
 
         public async Task<Guid> LogInUser(Login login)
@@ -84,7 +105,13 @@ namespace ServerApplication.BLL.Services
             if (result.Succeeded)
             {
                 var user = userManager.Users.SingleOrDefault(u => u.UserName.ToLower() == login.UserName.ToLower());
-                return new Guid(user.Id);
+                user.IsLoggedIn = true;
+                var res = await userManager.UpdateAsync(user);
+                if(res.Succeeded)
+                {
+                    return new Guid(user.Id);
+                }
+                throw new Exception("Couldn't log in user!");
             }
             throw new Exception("Wrong credentials!");
         }
