@@ -97,5 +97,24 @@ namespace ServerApplication.API.Controllers
                 return BadRequest(new { error = e.Message });
             }
         }
+
+        [HttpDelete]
+        public async Task<ActionResult<UserUpdateResponseData>> DeleteUser([FromBody] UserData model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            var targetUser = mapper.Map<User>(model);
+            try
+            {
+                var result = await userManagementService.DeleteUser(targetUser, userId);
+
+                return new UserUpdateResponseData() { UpdatedUserId = result };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
     }
 }

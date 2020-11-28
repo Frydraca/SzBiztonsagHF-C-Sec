@@ -16,5 +16,7 @@ namespace ServerApplication.BLL.Services.Interfaces
         public Task<User> GetUser(string id);
 
         public Task<List<User>> GetAllUsers(string askingUserId);
+
+        public Task<string> DeleteUser(User targetUser, string askingUserId);
     }
 }

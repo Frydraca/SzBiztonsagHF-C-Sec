@@ -57,6 +57,13 @@ export class FetchDataComponent {
         status: "blue",
       },
       {
+        name: "Delete User Test",
+        action: () => {
+          this.deleteUserTest("Delete User Test");
+        },
+        status: "blue",
+      },
+      {
         name: "Create Caff File Test",
         action: () => {
           this.createCaffTest("Create Caff File Test");
@@ -283,6 +290,40 @@ export class FetchDataComponent {
           this.testList.find((t) => t.name == name).status = "red";
         }
       );
+  };
+
+  deleteUserTest = (name: string) => {
+    axios({
+      method: "GET",
+      url: this.baseURL + "usermanagement/all",
+      headers: this.header,
+    }).then(
+      (successfulGet) => {
+        axios({
+          method: "DELETE",
+          url: this.baseURL + "usermanagement",
+          headers: this.header,
+          data: {
+            id: successfulGet.data[successfulGet.data.length - 1].id,
+            userName:
+              successfulGet.data[successfulGet.data.length - 1].userName,              
+          },
+        }).then(
+          (success) => {
+            console.log(success.data);
+            this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
   };
 
   createCaffTest = (name: string) => {
