@@ -9,5 +9,7 @@ namespace ServerApplication.BLL.Models.User.DB
     public class User : MongoUser
     {
         public bool IsAdmin { get; set; }
+
+        public bool IsLoggedIn { get; set; }
     }
 }

@@ -59,7 +59,10 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this user!"); 
             }
-            
+
+            var oldUser = await userManager.FindByIdAsync(targetUser.Id);
+            targetUser.IsAdmin = oldUser.IsAdmin;
+            targetUser.IsLoggedIn = oldUser.IsLoggedIn;
             var result = await userManager.UpdateAsync(targetUser);
             if(result.Succeeded)
             {

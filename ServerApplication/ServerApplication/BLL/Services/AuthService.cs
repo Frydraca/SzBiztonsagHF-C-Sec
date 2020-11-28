@@ -32,11 +32,19 @@ namespace ServerApplication.BLL.Services
 
         }
 
+        public async Task CheckIfUserIsLoggedIn(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            if(user.IsLoggedIn) return;
+            throw new Exception("User is not logged in!");
+        }
+
         public async Task<Guid> CreateNewUser(Registration registration)
         {
             if (registration.Password == registration.RepeatedPassword)
             {
-                var user = new User { UserName = registration.UserName, IsAdmin = false };
+                var user = new User { UserName = registration.UserName, IsAdmin = false, IsLoggedIn = true};
                 var result = await userManager.CreateAsync(user, registration.Password);
 
                 if (result.Succeeded)
@@ -84,7 +92,13 @@ namespace ServerApplication.BLL.Services
             if (result.Succeeded)
             {
                 var user = userManager.Users.SingleOrDefault(u => u.UserName.ToLower() == login.UserName.ToLower());
-                return new Guid(user.Id);
+                user.IsLoggedIn = true;
+                var res = await userManager.UpdateAsync(user);
+                if(res.Succeeded)
+                {
+                    return new Guid(user.Id);
+                }
+                throw new Exception("Couldn't log in user!");
             }
             throw new Exception("Wrong credentials!");
         }
