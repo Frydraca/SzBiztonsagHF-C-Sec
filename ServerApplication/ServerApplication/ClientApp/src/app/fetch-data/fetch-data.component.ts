@@ -98,6 +98,13 @@ export class FetchDataComponent {
         },
         status: "blue",
       },
+      {
+        name: "Add Comment Test",
+        action: () => {
+          this.addCommentTest("Add Comment Test");
+        },
+        status: "blue",
+      },
     ];
   }
 
@@ -452,6 +459,55 @@ export class FetchDataComponent {
           (success) => {
             console.log(success.data);
             this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  addCommentTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "tigris.caff",
+        comments: [{ text: "csikos" }, { text: "Fekete-sárga" }],
+      },
+    }).then(
+      (successfullpost) => {
+        axios({
+          method: "GET",
+          headers: this.header,
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+        }).then(
+          (successFullget) => {
+            axios({
+              method: "POST",
+              headers: this.header,
+              url:
+                this.baseURL + "caff/" + successfullpost.data.id + "/comments",
+              data: {
+                text: "nagymacska",
+              },
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
           },
           (error) => {
             console.log(error.response.data.error);

@@ -115,7 +115,9 @@ namespace ServerApplication.BLL.Services
         public string CreateNewComment(Comment newComment, string parentCaffId, string askingUserId)
         {
             CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
+            newComment.Id = ObjectId.GenerateNewId().ToString();
             newComment.Owner = askingUserId;
+            newComment.CreationDate = DateTime.Now;
             parentCaffFile.Comments.Add(newComment);
             if (caffFileRepository.Update(parentCaffFile))
             {
