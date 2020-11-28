@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace ServerApplication.API.Controllers
@@ -24,11 +25,9 @@ namespace ServerApplication.API.Controllers
         IAuthService authService;
         ICaffService caffService;
         IMapper mapper;
-        IHostingEnvironment environment;
 
-        public CaffController(IHostingEnvironment hostingEnvironment, IAuthService authService, ICaffService caffService, IMapper mapper)
+        public CaffController(IAuthService authService, ICaffService caffService, IMapper mapper)
         {
-            this.environment = hostingEnvironment;
             this.authService = authService;
             this.caffService = caffService;
             this.mapper = mapper;
@@ -72,20 +71,20 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpPost("{caffId}")]
-        [RequestFormLimits(MultipartBodyLengthLimit = 125829120)]
-        public ActionResult<CaffFileIdData> UploadCaffFile(string caffId, IFormFile postedFile)
+        [HttpPost("{caffId}"), DisableRequestSizeLimit]
+        public ActionResult<CaffFileIdData> UploadCaffFile(string caffId)
         {
-            string path = Path.Combine(environment.WebRootPath, "Uploads");
-            if (!Directory.Exists(path))
+            var file = Request.Form.Files[0];
+            var folderName = Path.Combine("Resources", "CAFFFiles");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            if (file.Length > 0)
             {
-                Directory.CreateDirectory(path);
-            }
-
-            string fileName = Path.GetFileName(postedFile.FileName);
-            using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
-            {
-                postedFile.CopyTo(stream);
+                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                var fullPath = Path.Combine(pathToSave, fileName);
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
             }
             return new CaffFileIdData()
             {
