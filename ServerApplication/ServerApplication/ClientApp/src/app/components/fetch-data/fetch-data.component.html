@@ -2,6 +2,8 @@
 
 <p>This component demonstrates the api.</p>
 
+<input type="file" id="file" (change)="handleFileInput($event.target.files)" />
+
 <table class="table table-striped" aria-labelledby="tableLabel">
   <thead>
     <tr>
@@ -24,5 +26,3 @@
     </tr>
   </tbody>
 </table>
-
-<input type="file" id="file" (change)="handleFileInput($event.target.files)" />

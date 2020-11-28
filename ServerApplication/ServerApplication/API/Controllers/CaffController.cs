@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using ServerApplication.API.DTOs.CaffFile;
 using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
@@ -71,7 +72,7 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpPost("{caffId}"), DisableRequestSizeLimit]
+        [HttpPost("{caffId}/upload"), DisableRequestSizeLimit]
         public async Task<ActionResult<CaffFileIdData>> UploadCaffFile(string caffId)
         {
             var userId = this.User.Claims.FirstOrDefault().Value;
@@ -86,6 +87,22 @@ namespace ServerApplication.API.Controllers
                 {
                     Id = caffId
                 };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpGet("{caffId}/download")]
+        public async Task<IActionResult> Download(string caffId)
+        {
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
+            {
+                await authService.CheckIfUserIsLoggedIn(userId);
+                var downloadableCaffFile = await caffService.DownloadCaffFile(caffId);
+                return File(downloadableCaffFile.Memory, GetContentType(downloadableCaffFile.FilePath));
             }
             catch (Exception e)
             {
@@ -261,5 +278,15 @@ namespace ServerApplication.API.Controllers
             }
         }
 
+        private string GetContentType(string path)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            if (!provider.TryGetContentType(path, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            return contentType;
+        }
     }
 }

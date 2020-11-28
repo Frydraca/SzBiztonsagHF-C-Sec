@@ -102,12 +102,17 @@ namespace ServerApplication.BLL.Services
 
         public string UploadCaffFile(string caffId, IFormFile file)
         {
-            var folderName = Path.Combine("Resources", "CAFFFiles");
-            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
             CaffFile caffFile = FindExistingCaffFile(caffId);
+            var folderName = Path.Combine("Resources", "CAFFFiles");
+            folderName = Path.Combine(folderName, caffFile.Owner);
+            if (!Directory.Exists(folderName))
+            {
+                Directory.CreateDirectory(folderName);
+            }
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
             if (file.Length > 0)
             {
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                var fileName =  caffFile.Id + "_" + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                 var fullPath = Path.Combine(pathToSave, fileName);
                 using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
@@ -224,6 +229,27 @@ namespace ServerApplication.BLL.Services
             }
 
             throw new Exception("Couldn't update the caff file!");
+        }
+        public async Task<DownloadableCAFF> DownloadCaffFile(string caffFileId)
+        {
+            CaffFile caffFile = FindExistingCaffFile(caffFileId);
+            if (!System.IO.File.Exists(caffFile.FilePath))
+            {
+                throw new Exception("This caff file dosen't exists on the server!");
+            }
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(caffFile.FilePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return new DownloadableCAFF()
+            {
+                Memory = memory,
+                FilePath = caffFile.FilePath
+            };
         }
 
         private CaffFile FindExistingCaffFile(string caffFileId)

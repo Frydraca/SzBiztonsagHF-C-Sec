@@ -22,7 +22,6 @@ namespace ServerApplication.BLL.Services.Interfaces
         public IEnumerable<Comment> GetCommentsOfCaffFile(string parentCaffId);
         public Task<string> UpdateComment(Comment updatedComment, string parentCaffId, string askingUserId);
         public Task<string> DeleteComment(string commentId, string parentCaffId, string askingUserId);
-
-
+        public Task<DownloadableCAFF> DownloadCaffFile(string caffFileId);
     }
 }
