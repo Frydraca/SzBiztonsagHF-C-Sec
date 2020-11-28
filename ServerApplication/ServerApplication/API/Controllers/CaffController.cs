@@ -63,14 +63,14 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<CaffFileData> GetCaffFile(string caffId)
+        [HttpGet("{caffId}")]
+        public async Task<ActionResult<CaffFileData>> GetCaffFile(string caffId)
         {
             var userId = this.User.Claims.FirstOrDefault().Value;
 
             try
             {
-                var caffFile = caffService.ReturnCaffFile(caffId, userId);
+                var caffFile = await caffService.ReturnCaffFile(caffId, userId);
                 return mapper.Map<CaffFileData>(caffFile);
             }
             catch (Exception e)
@@ -112,5 +112,6 @@ namespace ServerApplication.API.Controllers
                 return BadRequest(new { error = e.Message });
             }
         }
+
     }
 }

@@ -70,6 +70,20 @@ export class FetchDataComponent {
         },
         status: "blue",
       },
+      {
+        name: "Get Caff File By Id Test",
+        action: () => {
+          this.getCaffByIdTest("Get Caff File By Id Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Get Own Caff Files Test",
+        action: () => {
+          this.getOwnCaffFilesTest("Get Own Caff Files Test");
+        },
+        status: "blue",
+      },
     ];
   }
 
@@ -263,6 +277,104 @@ export class FetchDataComponent {
       }
     );
   };
+
+  getCaffByIdTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "medve.caff",
+        comments: [
+          { text: "Medveeeeee!" },
+          { text: "A medve alszik!" },
+          { text: "A medve mesék!" },
+        ],
+      } 
+    })
+    .then(
+      (successfullpost) => {
+        axios({
+          method: "GET",
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+          headers: this.header,
+        }).then(
+          (success) => {
+            console.log(success.data);
+            this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  getOwnCaffFilesTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "kutya.caff",
+        comments: [
+          { text: "Kutyák!" },
+          { text: "Dogs" },
+        ],
+      } 
+    })
+    .then(
+      () => {
+        axios({
+          method: "POST",
+          headers: this.header,
+          url: this.baseURL + "caff",
+          data: {
+            name: "cica.caff",
+            comments: [
+              { text: "Yuuumiiiii!" },
+              { text: "cicccc" },
+            ],
+          } 
+        })
+        .then(
+          () => {
+            axios({
+              method: "GET",
+              url: this.baseURL + "caff",
+              headers: this.header,
+            })
+            .then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        )
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+
 
   generateAuthenticationHeadder = () => {
     axios
