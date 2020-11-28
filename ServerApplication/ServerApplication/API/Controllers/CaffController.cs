@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServerApplication.API.DTOs.CaffFile;
 using ServerApplication.BLL.Models.CaffFile;
@@ -8,6 +10,7 @@ using ServerApplication.BLL.Models.CaffFile.DB;
 using ServerApplication.BLL.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,9 +24,11 @@ namespace ServerApplication.API.Controllers
         IAuthService authService;
         ICaffService caffService;
         IMapper mapper;
+        IHostingEnvironment environment;
 
-        public CaffController(IAuthService authService, ICaffService caffService, IMapper mapper)
+        public CaffController(IHostingEnvironment hostingEnvironment, IAuthService authService, ICaffService caffService, IMapper mapper)
         {
+            this.environment = hostingEnvironment;
             this.authService = authService;
             this.caffService = caffService;
             this.mapper = mapper;
@@ -65,6 +70,27 @@ namespace ServerApplication.API.Controllers
             {
                 return BadRequest(new { error = e.Message });
             }
+        }
+
+        [HttpPost("{caffId}")]
+        [RequestFormLimits(MultipartBodyLengthLimit = 125829120)]
+        public ActionResult<CaffFileIdData> UploadCaffFile(string caffId, IFormFile postedFile)
+        {
+            string path = Path.Combine(environment.WebRootPath, "Uploads");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            string fileName = Path.GetFileName(postedFile.FileName);
+            using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+            {
+                postedFile.CopyTo(stream);
+            }
+            return new CaffFileIdData()
+            {
+                Id = caffId
+            };
         }
 
         [HttpGet("{caffId}")]
