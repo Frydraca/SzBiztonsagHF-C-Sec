@@ -59,7 +59,7 @@ namespace ServerApplication.BLL.Services
 
         public async Task<AuthData> GetAuthdata(Guid id)
         {
-            var expirationTime = DateTime.UtcNow.AddDays(jwtLifespan);
+            var expirationTime = DateTime.UtcNow.AddSeconds(jwtLifespan);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -80,10 +80,23 @@ namespace ServerApplication.BLL.Services
             return new AuthData
             {
                 Token = token,
-                TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds(),
+                TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds()-((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
                 Id = id.ToString(),
                 IsAdmin = user.IsAdmin
             };
+        }
+
+        public async Task<string> LogOutUser(string askingGuidId)
+        {
+            var user = await userManager.FindByIdAsync(askingGuidId);
+            user.IsLoggedIn = false;
+
+            var result = await userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return user.Id;
+            }
+            throw new Exception("Log out was unsuccessfull!");
         }
 
         public async Task<Guid> LogInUser(Login login)

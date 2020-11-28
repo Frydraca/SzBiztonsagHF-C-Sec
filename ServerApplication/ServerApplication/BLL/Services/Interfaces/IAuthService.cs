@@ -11,6 +11,8 @@ namespace ServerApplication.BLL.Services.Interfaces
 
         public Task<Guid> LogInUser(Login login);
 
+        public Task<string> LogOutUser(string askingGuidId);
+
         public Task<AuthData> GetAuthdata(Guid id);
 
         public Task CheckIfUserIsLoggedIn(string userId);

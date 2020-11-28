@@ -29,6 +29,20 @@ export class FetchDataComponent {
         status: "blue",
       },
       {
+        name: "Logout Test",
+        action: () => {
+          this.logoutTest("Logout Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Refresh JWT Test",
+        action: () => {
+          this.refreshJWTTest("Refresh JWT Test");
+        },
+        status: "blue",
+      },
+      {
         name: "Get User Test",
         action: () => {
           this.getUserTest("Get User Test");
@@ -122,7 +136,9 @@ export class FetchDataComponent {
       {
         name: "Get All Comments Of Caff File Test",
         action: () => {
-          this.getAllCommentsOfCaffFileTest("Get All Comments Of Caff File Test");
+          this.getAllCommentsOfCaffFileTest(
+            "Get All Comments Of Caff File Test"
+          );
         },
         status: "blue",
       },
@@ -183,6 +199,40 @@ export class FetchDataComponent {
           this.testList.find((t) => t.name == name).status = "red";
         }
       );
+  };
+
+  logoutTest = (name: string) => {
+    axios({
+      method: "POST",
+      url: this.baseURL + "auth/logout",
+      headers: this.header,
+    }).then(
+      (success) => {
+        console.log(success.data);
+        this.testList.find((t) => t.name == name).status = "green";
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  refreshJWTTest = (name: string) => {
+    axios({
+      method: "POST",
+      url: this.baseURL + "auth/refresh-jwt",
+      headers: this.header,
+    }).then(
+      (success) => {
+        console.log(success.data);
+        this.testList.find((t) => t.name == name).status = "green";
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
   };
 
   getUserTest = (name: string) => {
@@ -306,7 +356,7 @@ export class FetchDataComponent {
           data: {
             id: successfulGet.data[successfulGet.data.length - 1].id,
             userName:
-              successfulGet.data[successfulGet.data.length - 1].userName,              
+              successfulGet.data[successfulGet.data.length - 1].userName,
           },
         }).then(
           (success) => {
@@ -648,7 +698,11 @@ export class FetchDataComponent {
       url: this.baseURL + "caff",
       data: {
         name: "tücsök.caff",
-        comments: [{ text: "cirip" }, { text: "ciripcirip" }, { text: "tücsök úr" }],
+        comments: [
+          { text: "cirip" },
+          { text: "ciripcirip" },
+          { text: "tücsök úr" },
+        ],
       },
     }).then(
       (successfullpost) => {
@@ -662,10 +716,7 @@ export class FetchDataComponent {
               method: "GET",
               headers: this.header,
               url:
-                this.baseURL +
-                "caff/" +
-                successfullpost.data.id +
-                "/comments"
+                this.baseURL + "caff/" + successfullpost.data.id + "/comments",
             }).then(
               (success) => {
                 console.log(success.data);
@@ -711,14 +762,11 @@ export class FetchDataComponent {
               method: "PUT",
               headers: this.header,
               url:
-                this.baseURL +
-                "caff/" +
-                successfullpost.data.id +
-                "/comments",
+                this.baseURL + "caff/" + successfullpost.data.id + "/comments",
               data: {
                 id: successFullget.data.comments[0].id,
                 text: "gömbölyű",
-              }
+              },
             }).then(
               (success) => {
                 console.log(success.data);
