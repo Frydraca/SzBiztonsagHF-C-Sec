@@ -13,7 +13,7 @@ namespace ServerApplication.BLL.Services.Interfaces
         public IEnumerable<CaffFile> GetAllCaffFiles();
         public IEnumerable<CaffFile> GetOwnCaffFiles(string askingUserId);
         public Task<CaffFile> ReturnCaffFile(string caffFileId, string askingUserId);
-        public Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId);
+        public Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string caffFileId, string askingUserId);
         public Task<string> DeleteCaffFile(string caffFileId, string askingUserId);
         public string CreateNewComment(Comment newComment, string parentCaffId);
         public Comment GetComment(string commentId, string askingUserId);

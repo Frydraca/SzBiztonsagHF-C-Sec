@@ -93,8 +93,47 @@ namespace ServerApplication.API.Controllers
             }
         }
 
+        [HttpPut("{caffid}")]
+        public async Task<ActionResult<CaffFileIdData>> UpdateCaffFile([FromBody] CaffFileData model, string caffId)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        [HttpPost("{id}/create")]
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
+            {
+                var caffFileId = await caffService.UpdateCaffFile(mapper.Map<CaffFile>(model), caffId, userId);
+                return new CaffFileIdData()
+                {
+                    Id = caffFileId
+                };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpDelete("{caffid}")]
+        public async Task<ActionResult<CaffFileIdData>> DeleteCaffFile(string caffId)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
+            {
+                var caffFileId = await caffService.DeleteCaffFile(caffId, userId);
+                return new CaffFileIdData()
+                {
+                    Id = caffFileId
+                };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpPost("{caffId}/create")]
         public ActionResult<CommentIdData> PostComment([FromBody] CommentData model, string caffId)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

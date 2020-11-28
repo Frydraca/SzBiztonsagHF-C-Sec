@@ -68,15 +68,19 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.Query(caffFile => caffFile.Owner == askingUserId);
         }
 
-        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId)
+        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile,string caffFileId, string askingUserId)
         {
             var askingUser = await userManager.FindByIdAsync(askingUserId);
 
-            CaffFile oldCaffFile = FindExistingCaffFile(updatedCaffFile.Id);
-            if (!hasAccessToCaffFile(updatedCaffFile.Id, askingUser))
+            if (!hasAccessToCaffFile(caffFileId, askingUser))
             {
                 throw new Exception("You have no access to this caff file!");
             }
+
+            CaffFile oldCaffFile = FindExistingCaffFile(caffFileId);
+            updatedCaffFile.Id = oldCaffFile.Id;
+            updatedCaffFile.FilePath = oldCaffFile.FilePath;
+            updatedCaffFile.Owner = oldCaffFile.Owner;
             if (caffFileRepository.Update(updatedCaffFile))
             {
                 return updatedCaffFile.Id;
