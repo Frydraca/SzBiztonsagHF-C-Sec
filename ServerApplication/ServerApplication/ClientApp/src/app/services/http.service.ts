@@ -6,6 +6,7 @@ import {LoginResponse} from '../models/login-response';
 import {UserDataResponse} from '../models/user-data-response';
 import {RegisterData} from '../models/register-data';
 import {RegisterResponse} from '../models/register-response';
+import {User} from '../models/user';
 import {map} from 'rxjs/operators';
 import {CaffImage} from '../models/caff-image';
 
@@ -75,6 +76,10 @@ export class HttpService {
     return this.getRequest<any>('usermanagement/all');
   }
 
+  public deleteUser(user: User): Observable<any>{
+    return this.deleteRequestWithBody<any>('usermanagement', user);
+  }
+
   private refreshJwt(): Observable<LoginResponse> {
     return this.postRequest<LoginResponse>('auth/refresh-jwt', null);
   }
@@ -85,6 +90,11 @@ export class HttpService {
 
   private deleteRequest<T>(urlEnd: string): Observable<T> {
     return this.httpClient.delete<T>(this.baseUrl + urlEnd, this.getHeader());
+  }
+
+  private deleteRequestWithBody<T>(urlEnd: string, postData: any): Observable<T> {
+    return this.httpClient.request<T>('delete', this.baseUrl + urlEnd,
+     { body: postData, headers: this.getHeader().headers  });
   }
 
   private postRequest<T>(urlEnd: string, postData: any): Observable<T> {

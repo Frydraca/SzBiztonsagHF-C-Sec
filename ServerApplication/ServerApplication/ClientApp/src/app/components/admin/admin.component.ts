@@ -1,7 +1,8 @@
-
-import { Component, OnInit } from "@angular/core";
-import {HttpService} from '../../services/http.service';
-import {User} from '../../models/user';
+import { Component, OnInit } from '@angular/core';
+import { AdminService } from '../../services/admin.service';
+import { HttpService } from '../../services/http.service';
+import { MessageService } from '../../services/message.service';
+import { User } from '../../models/user';
 
 @Component({
   selector: 'app-admin',
@@ -11,16 +12,35 @@ import {User} from '../../models/user';
 export class AdminComponent implements OnInit {
   users: User[];
 
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private adminService: AdminService,
+    private httpService: HttpService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit() {
-    this.httpService.getAllUser().subscribe(
-      users => (this.users = users.filter(user => user.userName != 'admin')),
-      error => console.log(error)
+    this.adminService.userListChanged.subscribe(
+      () => (this.users = this.adminService.getAllUsers())
     );
+    this.adminService.refreshList();
   }
 
   public onDeleteUser(id: string) {
-    console.log(id);
+    const user = this.adminService.getUserById(id);
+    this.httpService.deleteUser(user).subscribe(
+      result => this.handleDeleteResponse(result),
+      error => this.handleDeleteError(error)
+    );
+  }
+
+  private handleDeleteResponse(result: any) {
+    this.messageService.showInfoMessage('Delete successfull');
+    console.log(result);
+    this.adminService.refreshList();
+  }
+
+  private handleDeleteError(error: any) {
+    this.messageService.showErrorMessage('Delete failed');
+    console.log(error);
   }
 }
