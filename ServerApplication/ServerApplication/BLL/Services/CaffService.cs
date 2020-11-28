@@ -164,7 +164,13 @@ namespace ServerApplication.BLL.Services
             updatedComment.CreationDate = DateTime.Now;
             parentCaffFile.Comments.Remove(oldComment);
             parentCaffFile.Comments.Add(updatedComment);
-            return updatedComment.Id;
+
+            if(caffFileRepository.Update(parentCaffFile))
+            {
+                return updatedComment.Id;
+            }
+
+            throw new Exception("Couldn't update the caff file!");
         }
         public async Task<string> DeleteComment(string commentId, string parentCaffId, string askingUserId)
         {
@@ -181,7 +187,13 @@ namespace ServerApplication.BLL.Services
                 throw new Exception("Couldn't find the comment to delete!");
             }
             parentCaffFile.Comments.Remove(oldComment);
-            return commentId;
+
+            if (caffFileRepository.Update(parentCaffFile))
+            {
+                return commentId;
+            }
+
+            throw new Exception("Couldn't update the caff file!");
         }
 
         private CaffFile FindExistingCaffFile(string caffFileId)

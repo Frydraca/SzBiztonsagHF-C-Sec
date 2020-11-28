@@ -105,6 +105,34 @@ export class FetchDataComponent {
         },
         status: "blue",
       },
+      {
+        name: "Get Comment By Id Test",
+        action: () => {
+          this.getCommentByIdTest("Get Comment By Id Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Get All Comments Of Caff File Test",
+        action: () => {
+          this.getAllCommentsOfCaffFileTest("Get All Comments Of Caff File Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Update Comment Test",
+        action: () => {
+          this.updateCommentTest("Update Comment Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Delete Comment Test",
+        action: () => {
+          this.deleteCommentTest("Delete Comment Test");
+        },
+        status: "blue",
+      },
     ];
   }
 
@@ -498,6 +526,208 @@ export class FetchDataComponent {
               data: {
                 text: "nagymacska",
               },
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  getCommentByIdTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "párduc.caff",
+        comments: [{ text: "gyors" }, { text: "nagymacska" }],
+      },
+    }).then(
+      (successfullpost) => {
+        axios({
+          method: "GET",
+          headers: this.header,
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+        }).then(
+          (successFullget) => {
+            axios({
+              method: "GET",
+              headers: this.header,
+              url:
+                this.baseURL +
+                "caff/" +
+                successfullpost.data.id +
+                "/comments/" +
+                successFullget.data.comments[0].id,
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  getAllCommentsOfCaffFileTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "tücsök.caff",
+        comments: [{ text: "cirip" }, { text: "ciripcirip" }, { text: "tücsök úr" }],
+      },
+    }).then(
+      (successfullpost) => {
+        axios({
+          method: "GET",
+          headers: this.header,
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+        }).then(
+          (successFullget) => {
+            axios({
+              method: "GET",
+              headers: this.header,
+              url:
+                this.baseURL +
+                "caff/" +
+                successfullpost.data.id +
+                "/comments"
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  updateCommentTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "labda.caff",
+        comments: [{ text: "kerek" }, { text: "kék" }],
+      },
+    }).then(
+      (successfullpost) => {
+        axios({
+          method: "GET",
+          headers: this.header,
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+        }).then(
+          (successFullget) => {
+            axios({
+              method: "PUT",
+              headers: this.header,
+              url:
+                this.baseURL +
+                "caff/" +
+                successfullpost.data.id +
+                "/comments",
+              data: {
+                id: successFullget.data.comments[0].id,
+                text: "gömbölyű",
+              }
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  deleteCommentTest = (name: string) => {
+    axios({
+      method: "POST",
+      headers: this.header,
+      url: this.baseURL + "caff",
+      data: {
+        name: "blackhole.caff",
+        comments: [{ text: "black" }, { text: "hole" }],
+      },
+    }).then(
+      (successfullpost) => {
+        axios({
+          method: "GET",
+          headers: this.header,
+          url: this.baseURL + "caff/" + successfullpost.data.id,
+        }).then(
+          (successFullget) => {
+            axios({
+              method: "DELETE",
+              headers: this.header,
+              url:
+                this.baseURL +
+                "caff/" +
+                successfullpost.data.id +
+                "/comments/" +
+                successFullget.data.comments[0].id,
             }).then(
               (success) => {
                 console.log(success.data);
