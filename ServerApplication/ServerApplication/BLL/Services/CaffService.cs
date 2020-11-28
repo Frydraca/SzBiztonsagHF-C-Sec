@@ -100,7 +100,7 @@ namespace ServerApplication.BLL.Services
 
         public string CreateNewComment(Comment newComment, string parentCaffId)
         {
-            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+            CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
             parentCaffFile.Comments.Add(newComment);
             if (caffFileRepository.Update(parentCaffFile))
@@ -113,7 +113,7 @@ namespace ServerApplication.BLL.Services
 
         public Comment GetComment(string commentId, string parentCaffId)
         {
-            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+            CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
             Comment requestedComment = parentCaffFile.Comments.Find(c => c.Id == commentId);
             if(requestedComment == null)
@@ -125,7 +125,7 @@ namespace ServerApplication.BLL.Services
 
         public IEnumerable<Comment> GetCommentsOfCaffFile(string parentCaffId)
         {
-            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+            CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
             return parentCaffFile.Comments;
         }
@@ -137,7 +137,7 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this caff file!");
             }
-            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+            CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
             Comment oldComment = parentCaffFile.Comments.Find(c => c.Id == updatedComment.Id);
             if (oldComment == null)
@@ -155,7 +155,7 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this caff file!");
             }
-            CaffFile parentCaffFile = GetCaffFile(parentCaffId);
+            CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
             Comment oldComment = parentCaffFile.Comments.Find(c => c.Id == commentId);
             if (oldComment == null)
@@ -166,7 +166,7 @@ namespace ServerApplication.BLL.Services
             return commentId;
         }
 
-        private CaffFile GetCaffFile(string caffFileId)
+        private CaffFile FindExistingCaffFile(string caffFileId)
         {
             CaffFile caffFile = caffFileRepository.Find(caffFileId);
             if (caffFile == null)
