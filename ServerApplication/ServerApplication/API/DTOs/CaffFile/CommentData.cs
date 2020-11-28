@@ -9,6 +9,7 @@ namespace ServerApplication.API.DTOs.CaffFile
     {
         public string Id { get; set; }
         public string Text { get; set; }
+        public string Owner { get; set; }
         public DateTime CreationDate { get; set; }
     }
 }
