@@ -1,1 +1,35 @@
-<p>admin works!</p>
+<div class="row">
+  <div class="col-12">
+    <h2>All users</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Username</th>
+          <th scope="col">Update</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <th scope="row">1</th>
+          <td>Mark</td>
+          <td>
+            <button type="button" class="btn btn-primary">
+              <i class="fas fa-edit"></i>
+            </button>
+          </td>
+          <td>
+            <button type="button" class="btn btn-danger">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
