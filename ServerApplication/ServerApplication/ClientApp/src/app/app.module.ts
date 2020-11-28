@@ -40,6 +40,8 @@ import { UserDetailsComponent } from './user-details/user-details.component';
       {path: 'login', component: LoginRegisterComponent},
       {path: 'details', component: DetailsComponent},
       {path: 'admin', component: AdminComponent},
+      {path: 'user-details/:id', component: UserDetailsComponent},
+      {path: 'user-details', component: UserDetailsComponent},
     ]),
     ReactiveFormsModule
   ],

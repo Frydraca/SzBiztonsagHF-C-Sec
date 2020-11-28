@@ -16,15 +16,23 @@
       </thead>
       <tbody>
         <tr *ngFor="let user of users">
-          <th scope="row">1</th>
-          <td>Mark</td>
+          <th scope="row">{{ user.id }}</th>
+          <td>{{ user.userName }}</td>
           <td>
-            <button type="button" class="btn btn-primary">
+            <button
+              [routerLink]="['/user-details', user.id]"
+              type="button"
+              class="btn btn-primary"
+            >
               <i class="fas fa-edit"></i>
             </button>
           </td>
           <td>
-            <button type="button" class="btn btn-danger">
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="onDeleteUser(user.id)"
+            >
               <i class="fas fa-trash-alt"></i>
             </button>
           </td>

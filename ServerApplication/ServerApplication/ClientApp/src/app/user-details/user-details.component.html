@@ -1,1 +1,63 @@
-<p>user-details works!</p>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Change Username</h5>
+        <form (ngSubmit)="onUpdateUsername()" [formGroup]="usernameFormGroup">
+          <div class="form-group">
+            <label for="loginUserName">User name</label>
+            <input
+              formControlName="userName"
+              type="text"
+              class="form-control"
+              id="loginUserName"
+              placeholder="Enter user name"
+            />
+          </div>
+          <button type="submit" class="btn btn-danger">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Change Password</h5>
+        <form (ngSubmit)="onUpdatePassword()" [formGroup]="passwordFormGroup">
+          <div class="form-group">
+            <label for="oldPassword"> Old password </label>
+            <input
+              formControlName="oldPassword"
+              type="password"
+              class="form-control"
+              id="oldPassword"
+              placeholder="Old Password"
+            />
+          </div>
+          <div class="form-group">
+            <label for="newPassword"> New Password </label>
+            <input
+              formControlName="newPassword"
+              type="password"
+              class="form-control"
+              id="newPassword"
+              placeholder="New Password"
+            />
+          </div>
+          <div class="form-group">
+            <label for="newPasswordConfirm"> Confirm new password </label>
+            <input
+              formControlName="repeatedNewPassword"
+              type="password"
+              class="form-control"
+              id="newPasswordConfirm"
+              placeholder="Confirm new password"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-danger">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
