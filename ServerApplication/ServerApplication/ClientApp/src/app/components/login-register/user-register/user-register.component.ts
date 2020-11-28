@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {HttpService} from '../../services/http.service';
-import {RegisterData} from '../../models/register-data';
+import {HttpService} from '../../../services/http.service';
+import {RegisterData} from '../../../models/register-data';
 import {HttpErrorResponse} from '@angular/common/http';
-import {RegisterResponse} from '../../models/register-response';
-import {MessageService} from '../../services/message.service';
+import {RegisterResponse} from '../../../models/register-response';
+import {MessageService} from '../../../services/message.service';
 
 @Component({
   selector: 'app-user-register',

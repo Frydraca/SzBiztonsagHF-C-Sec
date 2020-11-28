@@ -5,20 +5,20 @@ import {HttpClientModule} from '@angular/common/http';
 import {RouterModule} from '@angular/router';
 
 import {AppComponent} from './app.component';
-import {NavMenuComponent} from './nav-menu/nav-menu.component';
-import {HomeComponent} from './home/home.component';
-import {FetchDataComponent} from './fetch-data/fetch-data.component';
-import {LoginRegisterComponent} from './login-register/login-register.component';
-import {AdminComponent} from './admin/admin.component';
-import {DetailsComponent} from './details/details.component';
-import {UserLoginComponent} from './login-register/user-login/user-login.component';
-import {UserRegisterComponent} from './login-register/user-register/user-register.component';
+import {LoginRegisterComponent} from './components/login-register/login-register.component';
+import {UserLoginComponent} from './components/login-register/user-login/user-login.component';
+import {UserRegisterComponent} from './components/login-register/user-register/user-register.component';
 import {UserService} from './services/user.service';
 import {HttpService} from './services/http.service';
-import {UserDetailsComponent} from './user-details/user-details.component';
 import {AuthGuard} from './guards/auth.guard';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NavMenuComponent} from './components/nav-menu/nav-menu.component';
+import {HomeComponent} from './components/home/home.component';
+import {FetchDataComponent} from './components/fetch-data/fetch-data.component';
+import {AdminComponent} from './components/admin/admin.component';
+import {DetailsComponent} from './components/details/details.component';
+import {UserDetailsComponent} from './components/user-details/user-details.component';
 
 @NgModule({
   declarations: [

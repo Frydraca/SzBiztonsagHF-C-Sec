@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
-import {UserService} from '../services/user.service';
-import {HttpService} from '../services/http.service';
 import {HttpErrorResponse} from '@angular/common/http';
+import {HttpService} from '../../services/http.service';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-nav-menu',
