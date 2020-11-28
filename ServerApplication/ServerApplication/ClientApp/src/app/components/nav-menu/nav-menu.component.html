@@ -29,7 +29,7 @@
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/login']"
-              >Login</a
+            >Login</a
             >
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
@@ -44,7 +44,12 @@
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
+            >Fetch data</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" (click)="logout()"
+            >Logout</a
             >
           </li>
         </ul>
