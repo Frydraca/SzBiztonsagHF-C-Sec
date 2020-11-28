@@ -41,8 +41,16 @@ export class HttpService {
     return this.httpClient.get<T>(this.baseUrl + urlEnd, this.getHeader());
   }
 
+  private deleteRequest<T>(urlEnd: string): Observable<T> {
+    return this.httpClient.delete<T>(this.baseUrl + urlEnd, this.getHeader());
+  }
+
   private postRequest<T>(urlEnd: string, postData: any): Observable<T> {
     return this.httpClient.post<T>(this.baseUrl + urlEnd, postData, this.getHeader());
+  }
+
+  private putRequest<T>(urlEnd: string, postData: any): Observable<T> {
+    return this.httpClient.put<T>(this.baseUrl + urlEnd, postData, this.getHeader());
   }
 
   private getHeader(): { headers: HttpHeaders } {

@@ -15,6 +15,7 @@ import { UserLoginComponent } from './login-register/user-login/user-login.compo
 import { UserRegisterComponent } from './login-register/user-register/user-register.component';
 import {UserService} from './user.service';
 import {HttpService} from './http.service';
+import { UserDetailsComponent } from './user-details/user-details.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import {HttpService} from './http.service';
     AdminComponent,
     DetailsComponent,
     UserLoginComponent,
-    UserRegisterComponent
+    UserRegisterComponent,
+    UserDetailsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({appId: 'ng-cli-universal'}),
