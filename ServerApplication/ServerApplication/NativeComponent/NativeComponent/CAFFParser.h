@@ -1,5 +1,11 @@
 #pragma once
 #include <fstream>
+#include <iostream>
+#include "lodepng.h"
+#include <time.h>
+#include <algorithm>
+#include <sstream>
+
 class CAFFParser
 {
 	struct IdAndLength {

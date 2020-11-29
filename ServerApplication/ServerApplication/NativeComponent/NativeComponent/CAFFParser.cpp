@@ -1,9 +1,4 @@
 #include "CAFFParser.h"
-#include <iostream>
-#include "lodepng.h"
-#include <time.h>
-#include <algorithm>
-#include <sstream>
 
 
 const std::string currentDateTime() {
