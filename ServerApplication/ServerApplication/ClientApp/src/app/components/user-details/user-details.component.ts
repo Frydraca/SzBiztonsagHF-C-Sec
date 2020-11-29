@@ -54,21 +54,33 @@ export class UserDetailsComponent implements OnInit {
   }
 
   public onUpdateUsername(): void {
+    console.log({ ...this.user, ...this.usernameFormGroup.getRawValue() });
     this.httpService
       .updateUser({ ...this.user, ...this.usernameFormGroup.getRawValue() })
       .subscribe(
-        respone => console.log(respone),
-        error => console.log(error)
+        respone => this.handleResponse(respone),
+        error => this.handleError(error)
       );
   }
 
   public onUpdatePassword(): void {
+    console.log({ ...this.user, ...this.passwordFormGroup.getRawValue() });
     this.httpService
       .changePassword({ ...this.user, ...this.passwordFormGroup.getRawValue() })
       .subscribe(
-        respone => console.log(respone),
-        error => console.log(error)
+        respone => this.handleResponse(respone),
+        error => this.handleError(error)
       );
+  }
+
+  private handleResponse(result: any) {
+    this.messageService.showInfoMessage('Successfull');
+    console.log(result);
+  }
+
+  private handleError(error: any) {
+    this.messageService.showErrorMessage('Failed');
+    console.log(error);
   }
 
   private initForms(): void {
