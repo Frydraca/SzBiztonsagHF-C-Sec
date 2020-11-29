@@ -335,6 +335,7 @@ export class FetchDataComponent {
       })
       .then(
         (successfullReg) => {
+          this.generateHeaderForFreshlyCreateduser(successfullReg.data)
           axios({
             method: "POST",
             url: this.baseURL + "usermanagement/change-password",
@@ -356,6 +357,7 @@ export class FetchDataComponent {
               this.testList.find((t) => t.name == name).status = "red";
             }
           );
+          this.generateAuthenticationHeadder();
         },
         (error) => {
           console.log(error.response.data.error);
@@ -1015,6 +1017,12 @@ export class FetchDataComponent {
           Authorization: "Bearer " + ret.data.token,
         };
       });
+  };
+
+  generateHeaderForFreshlyCreateduser = (jwt) => {
+    this.header = {
+      Authorization: "Bearer " + jwt.token,
+    };
   };
 
   downloadBlob = (fileName: string, blob: Blob): void => {

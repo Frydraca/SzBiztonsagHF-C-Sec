@@ -25,14 +25,16 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this user!");
             }
-            
+
+            var user = await userManager.FindByIdAsync(targetUser.Id);
+
             if (askingUser.IsAdmin)
             {
                 var resetToken = await userManager.GeneratePasswordResetTokenAsync(targetUser);
-                var result = await userManager.ResetPasswordAsync(targetUser, resetToken, changePassword.NewPassword);
+                var result = await userManager.ResetPasswordAsync(user, resetToken, changePassword.NewPassword);
                 if (result.Succeeded)
                 {
-                    return targetUser.Id;                  
+                    return user.Id;                  
                 }
                 throw new Exception("Password change failed!");
             }
@@ -43,10 +45,10 @@ namespace ServerApplication.BLL.Services
                     throw new Exception("The passwords are different!");
                 }
 
-                var result = await userManager.ChangePasswordAsync(targetUser, changePassword.OldPassword, changePassword.NewPassword);
+                var result = await userManager.ChangePasswordAsync(user, changePassword.OldPassword, changePassword.NewPassword);
                 if(result.Succeeded)
                 {
-                    return targetUser.Id;
+                    return user.Id;
                 }
                 throw new Exception("Wrong password!");
             }
@@ -63,6 +65,8 @@ namespace ServerApplication.BLL.Services
             var oldUser = await userManager.FindByIdAsync(targetUser.Id);
             targetUser.IsAdmin = oldUser.IsAdmin;
             targetUser.IsLoggedIn = oldUser.IsLoggedIn;
+            targetUser.PasswordHash = oldUser.PasswordHash;
+            targetUser.LockoutEnabled = oldUser.LockoutEnabled;
             var result = await userManager.UpdateAsync(targetUser);
             if(result.Succeeded)
             {
