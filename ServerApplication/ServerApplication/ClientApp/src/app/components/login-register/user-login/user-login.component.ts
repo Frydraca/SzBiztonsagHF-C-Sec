@@ -39,6 +39,7 @@ export class UserLoginComponent implements OnInit {
   }
 
   private handleLoginResponse(loginResponse: LoginResponse): void {
+    this.userService.setRole(loginResponse.isAdmin);
     this.httpService.getUserData().subscribe(
       userDataResponse => this.handleGetUserResponse(userDataResponse),
       error => this.handleGetUserError(error)
