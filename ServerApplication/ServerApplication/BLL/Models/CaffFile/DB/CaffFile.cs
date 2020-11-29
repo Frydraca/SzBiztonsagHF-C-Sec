@@ -13,7 +13,7 @@ namespace ServerApplication.BLL.Models.CaffFile.DB
         public string Name { get; set; }
         public string Owner { get; set; }
         public string FilePath { get; set; }
-        public byte[] AesKey { get; set; }
+        public AesEncryptingModel AesKey { get; set; }
         public DateTime CreationDate { get; set; }
         public List<Comment> Comments { get; set; }
 
