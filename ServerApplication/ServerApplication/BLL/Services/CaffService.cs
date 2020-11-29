@@ -84,6 +84,7 @@ namespace ServerApplication.BLL.Services
             CaffFile oldCaffFile = FindExistingCaffFile(updatedCaffFile.Id);
             updatedCaffFile.FilePath = oldCaffFile.FilePath;
             updatedCaffFile.Owner = oldCaffFile.Owner;
+            updatedCaffFile.AesKey = oldCaffFile.AesKey;
             updatedCaffFile.CreationDate = oldCaffFile.CreationDate;
             updatedCaffFile.Comments.Where(c => !oldCaffFile.Comments.Any(oc => oc.Text == c.Text))
                                     .ToList()
