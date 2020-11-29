@@ -4,6 +4,7 @@ using ServerApplication.BLL.Models.User.DB;
 using ServerApplication.BLL.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -103,7 +104,8 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this user!");
             }
-
+            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "CAFFFiles", targetUser.Id);
+            Directory.Delete(directoryPath, true);
             var result = await userManager.DeleteAsync(targetUser);
             if (result.Succeeded)
             {

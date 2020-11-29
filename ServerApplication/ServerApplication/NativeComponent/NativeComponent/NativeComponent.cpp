@@ -7,7 +7,7 @@
 #include <vector>
 #include "CAFFParser.h"
 #include "ConsoleParameterParser.h"
-#include "DecipherCAFF.h"
+//#include "DecipherCAFF.h"
 
 std::vector<char> HexToBytes(const std::string& hex) {
     std::vector<char> bytes;
@@ -27,13 +27,7 @@ int main(int argc, char* argv[])
     const char* path_of_file = argv[1];
     char* preview_path = argv[2];
 
-    char fname[_MAX_FNAME];
-
-    errno_t error = _splitpath_s(path_of_file,
-        NULL, 0,
-        NULL, 0,
-        fname, _MAX_FNAME,
-        NULL, 0);
+    char fname[256];
 
     std::ifstream infile;
     infile.open(path_of_file, std::ios::binary | std::ios::in);

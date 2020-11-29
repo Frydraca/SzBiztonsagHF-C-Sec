@@ -173,6 +173,11 @@ namespace ServerApplication.BLL.Services
             {
                 throw new Exception("You have no access to this caff file!");
             }
+            CaffFile caffFile = caffFileRepository.Find(caffFileId);
+            if(caffFile.FilePath != null)
+            {
+                File.Delete(caffFile.FilePath);
+            }
             if (caffFileRepository.Delete(caffFileId))
             {
                 return caffFileId;
