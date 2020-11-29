@@ -15,12 +15,17 @@
     </form>
 </div>
 <div class="upload">
-    <form>
+    <form [formGroup]="fileDataForm" (ngSubmit)="fileSubmit()">
         <div class="form-group">
-          <label for="exampleFormControlFile1">Upload new CAFF file</label>
-          <input type="file" class="form-control-file" id="exampleFormControlFile1">
+            <label for="file">File</label>
+            <input formControlName="file" id="file" type="file" class="form-control" (change)="onFileChange($event)">
+        </div>   
+        <div class="form-group">
+            <label for="comment">Comment</label>
+            <input formControlName="comment" id="comment" type="text" class="form-control">
         </div>
-      </form>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
 </div>
 
 <h3>Files</h3>

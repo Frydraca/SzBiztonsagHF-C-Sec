@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { CaffImage } from 'src/app/models/caff-image';
 import { HttpService } from 'src/app/services/http.service';
 
 @Component({
@@ -10,7 +12,7 @@ import { HttpService } from 'src/app/services/http.service';
 export class FilesComponent implements OnInit {
 
   constructor(
-    private httpService: HttpService) { }
+    private httpService: HttpService, private http: HttpClient) { }
 
     files = [];
     filesToShow = [];
@@ -27,6 +29,12 @@ export class FilesComponent implements OnInit {
   searchFiles = new FormGroup({
     name: new FormControl(),
     myfiles: new FormControl()
+  });
+  
+  fileDataForm = new FormGroup({
+    comment: new FormControl(''),
+    file: new FormControl('', [Validators.required]),
+    fileSource: new FormControl('', [Validators.required])
   });
 
   onSubmit() {
@@ -47,6 +55,34 @@ export class FilesComponent implements OnInit {
         }
       }
     });
+  }
+          
+  get f(){
+    return this.fileDataForm.controls;
+  }
+     
+  onFileChange(event) {
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      this.fileDataForm.patchValue({
+        fileSource: file
+      });
+    }
+  }
+     
+  fileSubmit(){
+    const formData = new FormData();
+    formData.append('caffFile', this.fileDataForm.get('fileSource').value, this.fileDataForm.get('fileSource').value.name);
+    let fileData = new CaffImage();
+    fileData.comments = [];
+    if (this.fileDataForm.get('comment').value !== '') {
+      fileData.comments.push(this.fileDataForm.get('comment').value)
+    }
+    fileData.name = this.fileDataForm.get('fileSource').value.name;
+    this.httpService.postCaffFileData(fileData).subscribe(response => {
+      this.httpService.postCaffFile(formData, response.id).subscribe();
+      this.getFiles();
+    })
   }
 
   getFiles() {

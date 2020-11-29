@@ -69,6 +69,14 @@ export class HttpService {
     return this.deleteRequest<CaffImage[]>('caff/' + id);
   }
 
+  public postCaffFileData(data: CaffImage): Observable<any> {
+    return this.postRequest<any>(`caff`, data);
+  }
+
+  public postCaffFile(caffFile, imageId: string): Observable<any> {
+    return this.postRequest<any>(`caff/${imageId}/upload`, caffFile);
+  }
+
   public addComment(imageId: string, comment: { text: string }): Observable<any> {
     return this.postRequest<any>(`caff/${imageId}/comments`, comment);
   }
