@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace ServerApplication.BLL.Services
@@ -73,7 +74,7 @@ namespace ServerApplication.BLL.Services
             return caffFileRepository.Query(caffFile => caffFile.Owner == askingUserId);
         }
 
-        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile,  string askingUserId)
+        public async Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId)
         {
             var askingUser = await userManager.FindByIdAsync(askingUserId);
 
@@ -84,6 +85,7 @@ namespace ServerApplication.BLL.Services
             CaffFile oldCaffFile = FindExistingCaffFile(updatedCaffFile.Id);
             updatedCaffFile.FilePath = oldCaffFile.FilePath;
             updatedCaffFile.Owner = oldCaffFile.Owner;
+            updatedCaffFile.AesKey = oldCaffFile.AesKey;
             updatedCaffFile.CreationDate = oldCaffFile.CreationDate;
             updatedCaffFile.Comments.Where(c => !oldCaffFile.Comments.Any(oc => oc.Text == c.Text))
                                     .ToList()
@@ -111,27 +113,57 @@ namespace ServerApplication.BLL.Services
             {
                 Directory.CreateDirectory(folderName);
             }
-            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            if (file.Length > 0)
-            {
-                var fileName =  caffFile.Id + "_" + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                var fullPath = Path.Combine(pathToSave, fileName);
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                }
-                caffFile.FilePath = fullPath;
-            }
-            else
-            {
-                throw new Exception("File was empty!");
-            }
 
-            if (caffFileRepository.Update(caffFile))
+            using (var random = new RNGCryptoServiceProvider())
             {
-                return caffId;
+                var key = new byte[16];
+                random.GetBytes(key);
+
+                byte[] IV;
+
+                using (Aes aesAlg = Aes.Create())
+                {
+                    aesAlg.Key = key;
+
+                    aesAlg.GenerateIV();
+                    IV = aesAlg.IV;
+
+                    aesAlg.Mode = CipherMode.CBC;
+
+                    var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+
+                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                    if (file.Length > 0)
+                    {
+                        var fileName = caffFile.Id + "_" + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        var fullPath = Path.Combine(pathToSave, fileName);
+                        using (var stream = new FileStream(fullPath, FileMode.Create))
+                        {
+                            using (var csEncrypt = new CryptoStream(stream, encryptor, CryptoStreamMode.Write))
+                            {
+                                file.CopyTo(csEncrypt);
+                            }
+                        }
+                        caffFile.FilePath = fullPath;
+                        caffFile.AesKey = new AesEncryptingModel()
+                        {
+                            Key = key,
+                            IV = IV
+                        };
+                    }
+                    else
+                    {
+                        throw new Exception("File was empty!");
+                    }
+
+                    if (caffFileRepository.Update(caffFile))
+                    {
+                        return caffId;
+                    }
+                    throw new Exception("Couldn't save the filepath of the uploaded file!");
+                }
             }
-            throw new Exception("Couldn't save the filepath of the uploaded file!");
         }
 
         public async Task<string> DeleteCaffFile(string caffFileId, string askingUserId)
@@ -169,7 +201,7 @@ namespace ServerApplication.BLL.Services
             CaffFile parentCaffFile = FindExistingCaffFile(parentCaffId);
 
             Comment requestedComment = parentCaffFile.Comments.Find(c => c.Id == commentId);
-            if(requestedComment == null)
+            if (requestedComment == null)
             {
                 throw new Exception("Couldn't find the requested comment!");
             }
@@ -202,7 +234,7 @@ namespace ServerApplication.BLL.Services
             parentCaffFile.Comments.Remove(oldComment);
             parentCaffFile.Comments.Add(updatedComment);
 
-            if(caffFileRepository.Update(parentCaffFile))
+            if (caffFileRepository.Update(parentCaffFile))
             {
                 return updatedComment.Id;
             }
@@ -241,11 +273,26 @@ namespace ServerApplication.BLL.Services
             }
 
             var memory = new MemoryStream();
-            using (var stream = new FileStream(caffFile.FilePath, FileMode.Open))
+
+            using (Aes aesAlg = Aes.Create())
             {
-                await stream.CopyToAsync(memory);
+                aesAlg.Key = caffFile.AesKey.Key;
+                aesAlg.IV = caffFile.AesKey.IV;
+
+                aesAlg.Mode = CipherMode.CBC;
+
+                // Create a decrytor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (var stream = new FileStream(caffFile.FilePath, FileMode.Open))
+                {
+                    using (var csDecrypt = new CryptoStream(stream, decryptor, CryptoStreamMode.Read))
+                    {
+                        await csDecrypt.CopyToAsync(memory);
+                    }
+                }
+                memory.Position = 0;
             }
-            memory.Position = 0;
 
             return new DownloadableFile()
             {
@@ -314,7 +361,7 @@ namespace ServerApplication.BLL.Services
             info.UseShellExecute = false;
             info.RedirectStandardInput = true;
             info.RedirectStandardOutput = true;
-            info.CreateNoWindow = true;            
+            info.CreateNoWindow = true;
 
             using (Process process = Process.Start(info))
             {
