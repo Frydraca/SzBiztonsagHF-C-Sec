@@ -35,12 +35,10 @@ export class AdminComponent implements OnInit {
 
   private handleDeleteResponse(result: any) {
     this.messageService.showInfoMessage('Delete successfull');
-    console.log(result);
     this.adminService.refreshList();
   }
 
   private handleDeleteError(error: any) {
     this.messageService.showErrorMessage('Delete failed');
-    console.log(error);
   }
 }

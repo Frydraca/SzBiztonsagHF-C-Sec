@@ -182,7 +182,6 @@ export class FetchDataComponent {
   }
 
   runAction = (name: string) => {
-    console.log(name);
     this.testList.find((t) => t.name == name).action();
   };
 
@@ -195,11 +194,9 @@ export class FetchDataComponent {
       })
       .then(
         (success) => {
-          console.log(success.data);
           this.testList.find((t) => t.name == name).status = "green";
         },
         (error) => {
-          console.log(error.response.data.error);
           this.testList.find((t) => t.name == name).status = "red";
         }
       );
@@ -213,11 +210,9 @@ export class FetchDataComponent {
       })
       .then(
         (success) => {
-          console.log(success.data);
           this.testList.find((t) => t.name == name).status = "green";
         },
         (error) => {
-          console.log(error.response.data.error);
           this.testList.find((t) => t.name == name).status = "red";
         }
       );
@@ -247,7 +242,6 @@ export class FetchDataComponent {
       headers: this.header,
     }).then(
       (success) => {
-        console.log(success.data);
         this.testList.find((t) => t.name == name).status = "green";
       },
       (error) => {

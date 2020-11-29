@@ -5,6 +5,8 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserService} from '../../services/user.service';
+import * as FileSaver from 'file-saver';
+
 
 @Component({
   selector: 'app-details',
@@ -22,6 +24,8 @@ export class DetailsComponent implements OnInit {
   public addCommentFormGroup: FormGroup = new FormGroup({
     text: new FormControl(null, Validators.required)
   });
+
+  public image;
 
   private routedImageId: string;
   private readonly baseUrl: string;
@@ -41,6 +45,14 @@ export class DetailsComponent implements OnInit {
     this.loadImage();
   }
 
+  public downloadClicked(): void {
+    this.httpService.downloadCaffFile(this.caffImagePreview.id)
+      .subscribe(
+        res => this.saveImage(res),
+        error => console.error(error)
+      );
+  }
+
   public addComment(): void {
     if (this.addCommentFormGroup.valid) {
       const newComment = this.addCommentFormGroup.getRawValue();
@@ -51,6 +63,10 @@ export class DetailsComponent implements OnInit {
           error => console.error(error)
         );
     }
+  }
+
+  private saveImage(blob): void {
+    FileSaver.saveAs(blob, this.caffImagePreview.name);
   }
 
   private loadImage(): void {
@@ -65,6 +81,12 @@ export class DetailsComponent implements OnInit {
   private handleImageLoaded(image: CaffImage): void {
     this.caffImagePreview = image;
     this.imageSource = this.baseUrl + image.name;
+
+    this.httpService.previewCaffFile(image.id).subscribe(
+      res => this.image = res,
+      error => console.error(error)
+    );
+
     this.showImage = true;
     this.changeDetector.detectChanges();
   }

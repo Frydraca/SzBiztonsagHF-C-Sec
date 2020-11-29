@@ -35,7 +35,6 @@ export class UserDetailsComponent implements OnInit {
   }
 
   private getUser(): void {
-    console.log(this.isUserAdmin);
     if (this.isUserAdmin) {
       this.getUserForAdmin();
     } else {
@@ -46,7 +45,6 @@ export class UserDetailsComponent implements OnInit {
 
   private getUserForAdmin(): void {
     this.route.paramMap.subscribe(paramMap => {
-      console.log(paramMap.get('id'));
       this.routeParam = paramMap.get('id');
       this.user = this.adminService.getUserById(this.routeParam);
       this.setUserName();
@@ -54,7 +52,6 @@ export class UserDetailsComponent implements OnInit {
   }
 
   public onUpdateUsername(): void {
-    console.log({ ...this.user, ...this.usernameFormGroup.getRawValue() });
     this.httpService
       .updateUser({ ...this.user, ...this.usernameFormGroup.getRawValue() })
       .subscribe(
@@ -64,7 +61,6 @@ export class UserDetailsComponent implements OnInit {
   }
 
   public onUpdatePassword(): void {
-    console.log({ ...this.user, ...this.passwordFormGroup.getRawValue() });
     this.httpService
       .changePassword({ ...this.user, ...this.passwordFormGroup.getRawValue() })
       .subscribe(
@@ -75,12 +71,10 @@ export class UserDetailsComponent implements OnInit {
 
   private handleResponse(result: any) {
     this.messageService.showInfoMessage('Successfull');
-    console.log(result);
   }
 
   private handleError(error: any) {
     this.messageService.showErrorMessage('Failed');
-    console.log(error);
   }
 
   private initForms(): void {

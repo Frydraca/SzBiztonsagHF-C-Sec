@@ -57,6 +57,22 @@ export class HttpService {
       ));
   }
 
+  public getCaffPreview(name: string): Observable<any> {
+    return this.postRequest('caff', {name: name});
+  }
+
+  public downloadCaffFile(id: string) {
+    const header = this.getHeader();
+    header['responseType'] = 'blob';
+    return this.httpClient.get(this.baseUrl + 'caff/' + id + '/download', header);
+  }
+
+  public previewCaffFile(id: string) {
+    const header = this.getHeader();
+    header['responseType'] = 'blob';
+    return this.httpClient.get(this.baseUrl + 'caff/' + id + '/preview', header);
+  }
+
   public listCaffFiles(): Observable<CaffImage[]> {
     return this.getRequest<CaffImage[]>('caff/all');
   }
@@ -97,7 +113,7 @@ export class HttpService {
     return this.getRequest<any>('usermanagement/all');
   }
 
-  public updateUser(user: User): Observable<any>{
+  public updateUser(user: User): Observable<any> {
     return this.putRequest<any>('usermanagement', user);
   }
 
@@ -105,7 +121,7 @@ export class HttpService {
     return this.postRequest<any>('usermanagement/change-password', requestData);
   }
 
-  public deleteUser(user: User): Observable<any>{
+  public deleteUser(user: User): Observable<any> {
     return this.deleteRequestWithBody<any>('usermanagement', user);
   }
 
@@ -123,7 +139,7 @@ export class HttpService {
 
   private deleteRequestWithBody<T>(urlEnd: string, postData: any): Observable<T> {
     return this.httpClient.request<T>('delete', this.baseUrl + urlEnd,
-     { body: postData, headers: this.getHeader().headers  });
+      {body: postData, headers: this.getHeader().headers});
   }
 
   private postRequest<T>(urlEnd: string, postData: any): Observable<T> {

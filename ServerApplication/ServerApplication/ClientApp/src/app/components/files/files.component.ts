@@ -31,7 +31,7 @@ export class FilesComponent implements OnInit {
     name: new FormControl(),
     myfiles: new FormControl()
   });
-  
+
   fileDataForm = new FormGroup({
     comment: new FormControl(''),
     file: new FormControl('', [Validators.required]),
@@ -39,8 +39,6 @@ export class FilesComponent implements OnInit {
   });
 
   onSubmit() {
-    console.log(this.searchFiles.get('name').value);
-    console.log(this.searchFiles.get('myfiles').value);
 
     let searchString = this.searchFiles.get('name').value
     let onlyMyFiles = this.searchFiles.get('myfiles').value
@@ -57,11 +55,11 @@ export class FilesComponent implements OnInit {
       }
     });
   }
-          
+
   get f(){
     return this.fileDataForm.controls;
   }
-     
+
   onFileChange(event) {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -70,7 +68,7 @@ export class FilesComponent implements OnInit {
       });
     }
   }
-     
+
   fileSubmit(){
     const formData = new FormData();
     formData.append('caffFile', this.fileDataForm.get('fileSource').value, this.fileDataForm.get('fileSource').value.name);
@@ -93,21 +91,18 @@ export class FilesComponent implements OnInit {
     this.httpService.listCaffFiles().subscribe(data => {
       this.files = data;
       this.filesToShow = data;
-      console.log(data);
     })
   }
 
   getMyFiles() {
     this.httpService.listMyCaffFiles().subscribe(data => {
       this.myFiles = data;
-      console.log(data);
     })
   }
 
   getMyData() {
     this.httpService.getUserData().subscribe(data => {
       this.myData = data;
-      console.log(data);
     })
   }
 

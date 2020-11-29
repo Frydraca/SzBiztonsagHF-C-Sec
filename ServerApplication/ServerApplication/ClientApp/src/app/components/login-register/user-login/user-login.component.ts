@@ -52,7 +52,7 @@ export class UserLoginComponent implements OnInit {
 
   private handleGetUserResponse(userDataResponse: UserDataResponse): void {
     this.userService.setLoggedInUser(userDataResponse);
-    this.router.navigate(['/']).then().catch();
+    this.router.navigate(['/files']).then().catch();
   }
 
   private handleGetUserError(loginError: HttpErrorResponse): void {

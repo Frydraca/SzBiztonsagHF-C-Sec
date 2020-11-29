@@ -20,44 +20,32 @@
         [ngClass]="{ show: isExpanded }"
       >
         <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
+          <li *ngIf="!isLoggedIn()" class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/login']"
             >Login</a
             >
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
+          <li *ngIf="isLoggedIn()" class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/files']"
             >Files</a
             >
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/details/5fc256b9b8749f93dc0d7f56']"
-            >Details</a
-            >
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
+          <li *ngIf="isAdmin()" class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/admin']"
             >Admin</a
             >
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
+          <li *ngIf="isLoggedIn() && !isAdmin()" class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/user-details']"
             >User details</a
             >
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-            >Fetch data</a
-            >
-          </li>
-          <li class="nav-item">
+<!--          <li class="nav-item" [routerLinkActive]="['link-active']">-->
+<!--            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"-->
+<!--            >Fetch data</a-->
+<!--            >-->
+<!--          </li>-->
+          <li *ngIf="isLoggedIn()" class="nav-item">
             <a class="nav-link text-dark" [routerLink]="['/login']" (click)="logout()"
             >Logout</a
             >

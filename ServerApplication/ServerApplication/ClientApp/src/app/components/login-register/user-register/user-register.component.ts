@@ -41,11 +41,11 @@ export class UserRegisterComponent implements OnInit {
   }
 
   private handleRegisterResponse(registerResponse: RegisterResponse): void {
-
+    this.messageService.showInfoMessage('Registered successfully');
   }
 
   private handleRegisterError(error: HttpErrorResponse): void {
-
+    this.messageService.showErrorMessage('Registration error');
   }
 
   private handleNotMatchingPasswords(): void {
