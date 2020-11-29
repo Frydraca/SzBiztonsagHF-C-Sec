@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using ServerApplication.API.DTOs.CaffFile;
 using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
@@ -71,25 +72,42 @@ namespace ServerApplication.API.Controllers
             }
         }
 
-        [HttpPost("{caffId}"), DisableRequestSizeLimit]
-        public ActionResult<CaffFileIdData> UploadCaffFile(string caffId)
+        [HttpPost("{caffId}/upload"), DisableRequestSizeLimit]
+        public async Task<ActionResult<CaffFileIdData>> UploadCaffFile(string caffId)
         {
-            var file = Request.Form.Files[0];
-            var folderName = Path.Combine("Resources", "CAFFFiles");
-            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            if (file.Length > 0)
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
             {
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                var fullPath = Path.Combine(pathToSave, fileName);
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                await authService.CheckIfUserIsLoggedIn(userId);
+
+                var file = Request.Form.Files[0];
+                var id = caffService.UploadCaffFile(caffId, file);
+
+                return new CaffFileIdData()
                 {
-                    file.CopyTo(stream);
-                }
+                    Id = caffId
+                };
             }
-            return new CaffFileIdData()
+            catch (Exception e)
             {
-                Id = caffId
-            };
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpGet("{caffId}/download")]
+        public async Task<IActionResult> Download(string caffId)
+        {
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
+            {
+                await authService.CheckIfUserIsLoggedIn(userId);
+                var downloadableCaffFile = await caffService.DownloadCaffFile(caffId);
+                return File(downloadableCaffFile.Memory, GetContentType(downloadableCaffFile.FilePath));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
         }
 
         [HttpGet("{caffId}")]
@@ -110,7 +128,7 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<List<CaffFileData>>> GetAllCaffFiles()
+        public async Task<ActionResult<List<CaffFileData>>> GetAllCaffFiles(string caffId)
         {
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
@@ -118,6 +136,22 @@ namespace ServerApplication.API.Controllers
                 await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFiles = caffService.GetAllCaffFiles();
                 return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpGet("{caffId}/preview")]
+        public async Task<IActionResult> GetPreviewFile(string caffId)
+        {
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
+            {
+                await authService.CheckIfUserIsLoggedIn(userId);
+                var downloadablePreview = await caffService.DownloadPreview(caffId);
+                return File(downloadablePreview.Memory, GetContentType(downloadablePreview.FilePath));
             }
             catch (Exception e)
             {
@@ -260,5 +294,15 @@ namespace ServerApplication.API.Controllers
             }
         }
 
+        private string GetContentType(string path)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            if (!provider.TryGetContentType(path, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            return contentType;
+        }
     }
 }

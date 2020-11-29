@@ -10,6 +10,7 @@ namespace ServerApplication.API.DTOs.CaffFile
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Owner { get; set; }
         public DateTime CreationDate { get; set; }
         public List<CommentData> Comments { get; set; }
     }

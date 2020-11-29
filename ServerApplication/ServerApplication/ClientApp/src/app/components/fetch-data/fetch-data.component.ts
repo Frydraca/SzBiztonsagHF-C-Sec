@@ -9,6 +9,7 @@ export class FetchDataComponent {
   public testList: Test[];
   public baseURL: string;
   public header: {};
+  public fileToUpload: File;
 
   constructor(@Inject("BASE_URL") baseUrl: string) {
     this.baseURL = baseUrl;
@@ -153,6 +154,27 @@ export class FetchDataComponent {
         name: "Delete Comment Test",
         action: () => {
           this.deleteCommentTest("Delete Comment Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Upload Caff Test",
+        action: () => {
+          this.uploadCaffTest("Upload Caff Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Download Caff Test",
+        action: () => {
+          this.downloadCaffTest("Download Caff Test");
+        },
+        status: "blue",
+      },
+      {
+        name: "Preview Caff Test",
+        action: () => {
+          this.previewCaffTest("Preview Caff Test");
         },
         status: "blue",
       },
@@ -841,6 +863,147 @@ export class FetchDataComponent {
     );
   };
 
+  uploadCaffTest = (name: string) => {
+    var formData = new FormData();
+    formData.append("caffFile", this.fileToUpload, this.fileToUpload.name);
+    axios({
+      method: "POST",
+      url: this.baseURL + "caff",
+      headers: this.header,
+      data: {
+        name: "kacsa.caff",
+        comments: [],
+      },
+    }).then(
+      (successPost) => {
+        axios({
+          method: "POST",
+          headers: { ...this.header, "Content-Type": "multipart/form-data" },
+          url: this.baseURL + "caff/" + successPost.data.id + "/upload",
+          data: formData,
+        }).then(
+          (success) => {
+            console.log(success.data);
+            this.testList.find((t) => t.name == name).status = "green";
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  downloadCaffTest = (name: string) => {
+    var formData = new FormData();
+    formData.append("caffFile", this.fileToUpload, this.fileToUpload.name);
+    axios({
+      method: "POST",
+      url: this.baseURL + "caff",
+      headers: this.header,
+      data: {
+        name: "downloadTest.caff",
+        comments: [],
+      },
+    }).then(
+      (successPost) => {
+        axios({
+          method: "POST",
+          headers: { ...this.header, "Content-Type": "multipart/form-data" },
+          url: this.baseURL + "caff/" + successPost.data.id + "/upload",
+          data: formData,
+        }).then(
+          (successUpload) => {
+            axios({
+              method: "GET",
+              headers: this.header,
+              url: this.baseURL + "caff/" + successUpload.data.id + "/download",
+              responseType: "blob",
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.downloadBlob(this.fileToUpload.name, success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+  previewCaffTest = (name: string) => {
+    var formData = new FormData();
+    formData.append("caffFile", this.fileToUpload, this.fileToUpload.name);
+    axios({
+      method: "POST",
+      url: this.baseURL + "caff",
+      headers: this.header,
+      data: {
+        name: "previewTest.caff",
+        comments: [],
+      },
+    }).then(
+      (successPost) => {
+        axios({
+          method: "POST",
+          headers: { ...this.header, "Content-Type": "multipart/form-data" },
+          url: this.baseURL + "caff/" + successPost.data.id + "/upload",
+          data: formData,
+        }).then(
+          (successUpload) => {
+            axios({
+              method: "GET",
+              headers: this.header,
+              url: this.baseURL + "caff/" + successUpload.data.id + "/preview",
+              responseType: "blob",
+            }).then(
+              (success) => {
+                console.log(success.data);
+                this.downloadBlob(this.fileToUpload.name, success.data);
+                this.testList.find((t) => t.name == name).status = "green";
+              },
+              (error) => {
+                console.log(error.response.data.error);
+                this.testList.find((t) => t.name == name).status = "red";
+              }
+            );
+          },
+          (error) => {
+            console.log(error.response.data.error);
+            this.testList.find((t) => t.name == name).status = "red";
+          }
+        );
+      },
+      (error) => {
+        console.log(error.response.data.error);
+        this.testList.find((t) => t.name == name).status = "red";
+      }
+    );
+  };
+
+
+  handleFileInput = (files: FileList) => {
+    this.fileToUpload = files[0];
+  };
+
   generateAuthenticationHeadder = () => {
     axios
       .post(this.baseURL + "auth/login", {
@@ -852,6 +1015,20 @@ export class FetchDataComponent {
           Authorization: "Bearer " + ret.data.token,
         };
       });
+  };
+
+  downloadBlob = (fileName: string, blob: Blob): void => {
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, fileName);
+    } else {
+      const anchor = window.document.createElement("a");
+      anchor.href = window.URL.createObjectURL(blob);
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      window.URL.revokeObjectURL(anchor.href);
+    }
   };
 }
 

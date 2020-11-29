@@ -1,18 +1,16 @@
-import {Injectable} from '@angular/core';
-import {User} from '../models/user';
-import {Subject} from 'rxjs';
-import {HttpService} from './http.service';
+import { Injectable } from '@angular/core';
+import { User } from '../models/user';
+import { Subject } from 'rxjs';
+import { HttpService } from './http.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-
   public userListChanged: Subject<void> = new Subject();
   private users: User[] = [];
 
-  constructor(private httpService: HttpService) {
-  }
+  constructor(private httpService: HttpService) {}
 
   public refreshList(): void {
     this.httpService.getAllUser().subscribe(
@@ -30,7 +28,7 @@ export class AdminService {
   }
 
   private handleUserListResponse(users: User[]): void {
-    this.users = users;
+    this.users = users.filter(user => user.userName != 'admin');
     this.userListChanged.next();
   }
 }
