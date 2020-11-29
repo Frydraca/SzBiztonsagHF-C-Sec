@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
+using Newtonsoft.Json;
 using ServerApplication.BLL.Models.CaffFile;
 using ServerApplication.BLL.Models.CaffFile.DB;
 using ServerApplication.BLL.Models.User.DB;
@@ -8,6 +9,7 @@ using ServerApplication.BLL.RepositoryInterfaces;
 using ServerApplication.BLL.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -230,10 +232,10 @@ namespace ServerApplication.BLL.Services
 
             throw new Exception("Couldn't update the caff file!");
         }
-        public async Task<DownloadableCAFF> DownloadCaffFile(string caffFileId)
+        public async Task<DownloadableFile> DownloadCaffFile(string caffFileId)
         {
             CaffFile caffFile = FindExistingCaffFile(caffFileId);
-            if (!System.IO.File.Exists(caffFile.FilePath))
+            if (!File.Exists(caffFile.FilePath))
             {
                 throw new Exception("This caff file dosen't exists on the server!");
             }
@@ -245,10 +247,35 @@ namespace ServerApplication.BLL.Services
             }
             memory.Position = 0;
 
-            return new DownloadableCAFF()
+            return new DownloadableFile()
             {
                 Memory = memory,
                 FilePath = caffFile.FilePath
+            };
+        }
+        public async Task<DownloadableFile> DownloadPreview(string caffFileId)
+        {
+            CaffFile caffFile = FindExistingCaffFile(caffFileId);
+            if (!File.Exists(caffFile.FilePath))
+            {
+                throw new Exception("This caff file dosen't exists on the server!");
+            }
+
+            var previewData = RunNativeComponent(caffFile.FilePath);
+            previewData = previewData.Replace('\\', '/');
+            var preview = JsonConvert.DeserializeObject<PreviewModel>(previewData);
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(preview.PreviewPath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return new DownloadableFile()
+            {
+                Memory = memory,
+                FilePath = preview.PreviewPath
             };
         }
 
@@ -275,6 +302,37 @@ namespace ServerApplication.BLL.Services
             var comment = caffFile.Comments.Find(c => c.Id == commentId);
 
             return comment.Owner == askingUser.Id || askingUser.IsAdmin;
+        }
+
+        private static string RunNativeComponent(string filePath)
+        {
+            var command = "NativeComponent\\Release\\NativeComponent.exe " + filePath + " " + Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Previews") + "\\";
+
+            string returnvalue = string.Empty;
+
+            ProcessStartInfo info = new ProcessStartInfo("cmd");
+            info.UseShellExecute = false;
+            info.RedirectStandardInput = true;
+            info.RedirectStandardOutput = true;
+            info.CreateNoWindow = true;            
+
+            using (Process process = Process.Start(info))
+            {
+                StreamWriter sw = process.StandardInput;
+                StreamReader sr = process.StandardOutput;
+
+
+                sw.WriteLine(command);
+
+
+                sw.Close();
+                returnvalue = sr.ReadToEnd();
+                var endindex = returnvalue.IndexOf("--END--");
+                returnvalue = returnvalue.Remove(endindex);
+                returnvalue = returnvalue.Split("--START--").Last();
+            }
+
+            return returnvalue;
         }
 
 

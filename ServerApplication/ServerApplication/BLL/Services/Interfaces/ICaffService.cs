@@ -13,6 +13,7 @@ namespace ServerApplication.BLL.Services.Interfaces
         public string CreateNewCaffFile(CaffFile newCaffFile, string askingUserId);
         public IEnumerable<CaffFile> GetAllCaffFiles();
         public IEnumerable<CaffFile> GetOwnCaffFiles(string askingUserId);
+        public Task<DownloadableFile> DownloadPreview(string caffFileId);
         public Task<CaffFile> ReturnCaffFile(string caffFileId, string askingUserId);
         public Task<string> UpdateCaffFile(CaffFile updatedCaffFile, string askingUserId);
         public string UploadCaffFile(string caffId, IFormFile file);
@@ -22,6 +23,6 @@ namespace ServerApplication.BLL.Services.Interfaces
         public IEnumerable<Comment> GetCommentsOfCaffFile(string parentCaffId);
         public Task<string> UpdateComment(Comment updatedComment, string parentCaffId, string askingUserId);
         public Task<string> DeleteComment(string commentId, string parentCaffId, string askingUserId);
-        public Task<DownloadableCAFF> DownloadCaffFile(string caffFileId);
+        public Task<DownloadableFile> DownloadCaffFile(string caffFileId);
     }
 }

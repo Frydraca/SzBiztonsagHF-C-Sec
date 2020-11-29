@@ -128,7 +128,7 @@ namespace ServerApplication.API.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<List<CaffFileData>>> GetAllCaffFiles()
+        public async Task<ActionResult<List<CaffFileData>>> GetAllCaffFiles(string caffId)
         {
             var userId = this.User.Claims.FirstOrDefault().Value;
             try
@@ -136,6 +136,22 @@ namespace ServerApplication.API.Controllers
                 await authService.CheckIfUserIsLoggedIn(userId);
                 var caffFiles = caffService.GetAllCaffFiles();
                 return caffFiles.Select(mapper.Map<CaffFileData>).ToList();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [HttpGet("{caffId}/preview")]
+        public async Task<IActionResult> GetPreviewFile(string caffId)
+        {
+            var userId = this.User.Claims.FirstOrDefault().Value;
+            try
+            {
+                await authService.CheckIfUserIsLoggedIn(userId);
+                var downloadablePreview = await caffService.DownloadPreview(caffId);
+                return File(downloadablePreview.Memory, GetContentType(downloadablePreview.FilePath));
             }
             catch (Exception e)
             {
