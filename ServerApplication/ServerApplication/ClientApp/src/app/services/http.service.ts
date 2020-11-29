@@ -6,6 +6,7 @@ import {LoginResponse} from '../models/login-response';
 import {UserDataResponse} from '../models/user-data-response';
 import {RegisterData} from '../models/register-data';
 import {RegisterResponse} from '../models/register-response';
+import {ChangePasswordData} from '../models/change-password-data';
 import {User} from '../models/user';
 import {map} from 'rxjs/operators';
 import {CaffImage} from '../models/caff-image';
@@ -74,6 +75,14 @@ export class HttpService {
 
   public getAllUser(): Observable<any> {
     return this.getRequest<any>('usermanagement/all');
+  }
+
+  public updateUser(user: User): Observable<any>{
+    return this.putRequest<any>('usermanagement', user);
+  }
+
+  public changePassword(requestData: ChangePasswordData): Observable<any> {
+    return this.postRequest<any>('usermanagement/change-password', requestData);
   }
 
   public deleteUser(user: User): Observable<any>{

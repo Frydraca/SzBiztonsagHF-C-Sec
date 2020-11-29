@@ -26,6 +26,10 @@ export class UserService {
     return this.isUserLoggedIn;
   }
 
+  public getLoggedInUser(): User {
+    return this.loggedInUser;
+  }
+
   public isAdmin(): boolean {
     return this.isUserAdmin;
   }
