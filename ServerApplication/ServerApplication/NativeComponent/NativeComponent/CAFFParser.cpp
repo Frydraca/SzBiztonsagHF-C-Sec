@@ -14,7 +14,7 @@ const std::string currentDateTime() {
 	return ret;
 }
 
-CAFFParser::IdAndLength CAFFParser::GetBlockIdAndLength(std::ifstream* infile)
+CAFFParser::IdAndLength CAFFParser::GetBlockIdAndLength(std::istream* infile)
 {
 	IdAndLength ret;
 	char id[1];
@@ -28,7 +28,7 @@ CAFFParser::IdAndLength CAFFParser::GetBlockIdAndLength(std::ifstream* infile)
 	return ret;
 }
 
-void CAFFParser::ParseCAFFAnimation(std::ifstream* infile, char* fname, CAFFMetadata* caffMetadata, char* previewPath)
+void CAFFParser::ParseCAFFAnimation(std::istream* infile, char* fname, CAFFMetadata* caffMetadata, char* previewPath)
 {
 	char duration[8];
 	infile->read(duration, sizeof(duration));
@@ -92,7 +92,7 @@ void CAFFParser::ParseCAFFAnimation(std::ifstream* infile, char* fname, CAFFMeta
 	caffMetadata->PreviewPath = preview_path;
 }
 
-void CAFFParser::ParseCAFFCredit(std::ifstream* infile, CAFFMetadata* caffMetadata)
+void CAFFParser::ParseCAFFCredit(std::istream* infile, CAFFMetadata* caffMetadata)
 {
 	char year[2];
 	infile->read(year, sizeof(year));
@@ -124,7 +124,7 @@ void CAFFParser::ParseCAFFCredit(std::ifstream* infile, CAFFMetadata* caffMetada
 	caffMetadata->Creator = str_creator;
 }
 
-CAFFParser::CAFFMetadata CAFFParser::ReturnPreview(std::ifstream* infile, char* fname, char* previewPath)
+CAFFParser::CAFFMetadata CAFFParser::ReturnPreview(std::istream* infile, char* fname, char* previewPath)
 {
 	IdAndLength headerBlock = GetBlockIdAndLength(infile);
 

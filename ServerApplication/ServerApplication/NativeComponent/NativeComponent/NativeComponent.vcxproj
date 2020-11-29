@@ -148,11 +148,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CAFFParser.cpp" />
+    <ClCompile Include="DecipherCAFF.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="NativeComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAFFParser.h" />
+    <ClInclude Include="DecipherCAFF.h" />
     <ClInclude Include="lodepng.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

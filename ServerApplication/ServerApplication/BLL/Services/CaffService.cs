@@ -308,7 +308,10 @@ namespace ServerApplication.BLL.Services
                 throw new Exception("This caff file dosen't exists on the server!");
             }
 
-            var previewData = RunNativeComponent(caffFile.FilePath);
+            var tempPath = CreateTempDecriptedFile(caffFile);
+            var previewData = RunNativeComponent(tempPath);
+            File.Delete(tempPath);
+            
             previewData = previewData.Replace('\\', '/');
             var preview = JsonConvert.DeserializeObject<PreviewModel>(previewData);
 
@@ -353,7 +356,7 @@ namespace ServerApplication.BLL.Services
 
         private static string RunNativeComponent(string filePath)
         {
-            var command = "NativeComponent\\Release\\NativeComponent.exe " + filePath + " " + Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Previews") + "\\";
+            var command = "NativeComponent\\x64\\Release\\NativeComponent.exe " + filePath + " " + Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Previews") + "\\";
 
             string returnvalue = string.Empty;
 
@@ -371,7 +374,6 @@ namespace ServerApplication.BLL.Services
 
                 sw.WriteLine(command);
 
-
                 sw.Close();
                 returnvalue = sr.ReadToEnd();
                 var endindex = returnvalue.IndexOf("--END--");
@@ -382,6 +384,34 @@ namespace ServerApplication.BLL.Services
             return returnvalue;
         }
 
+        private string CreateTempDecriptedFile(CaffFile caffFile)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = caffFile.AesKey.Key;
+                aesAlg.IV = caffFile.AesKey.IV;
 
+                aesAlg.Mode = CipherMode.CBC;
+
+                // Create a decrytor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Temp");
+                var tempPath = Path.Combine(pathToSave, caffFile.Id + ".temp");
+
+                using (var stream = new FileStream(caffFile.FilePath, FileMode.Open))
+                {
+                    using (var csDecrypt = new CryptoStream(stream, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (var outStream = new FileStream(tempPath, FileMode.Create))
+                        {
+                            csDecrypt.CopyTo(outStream);
+                        }
+                    }
+                }
+
+                return tempPath;
+            }
+            throw new Exception("Couldn't decrypt file!");
+        }
     }
 }

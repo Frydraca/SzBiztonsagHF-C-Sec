@@ -2,27 +2,23 @@
 //
 
 #include <iostream>
-#include <iomanip>
-#include <string>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include "CAFFParser.h"
 #include "ConsoleParameterParser.h"
-#include <openssl/sha.h>
+#include "DecipherCAFF.h"
 
-std::string sha256(const std::string str)
-{
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, str.c_str(), str.size());
-    SHA256_Final(hash, &sha256);
-    std::stringstream ss;
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
-    {
-        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+std::vector<char> HexToBytes(const std::string& hex) {
+    std::vector<char> bytes;
+
+    for (unsigned int i = 0; i < hex.length(); i += 2) {
+        std::string byteString = hex.substr(i, 2);
+        char byte = (char)strtol(byteString.c_str(), NULL, 16);
+        bytes.push_back(byte);
     }
-    return ss.str();
+
+    return bytes;
 }
 
 
@@ -30,12 +26,8 @@ int main(int argc, char* argv[])
 {
     const char* path_of_file = argv[1];
     char* preview_path = argv[2];
-    char fname[_MAX_FNAME];
 
-    std::cout << sha256("alma") << std::endl;
-    std::cout << sha256("1234567890_2") << std::endl;
-    std::cout << sha256("1234567890_3") << std::endl;
-    std::cout << sha256("1234567890_4") << std::endl;
+    char fname[_MAX_FNAME];
 
     errno_t error = _splitpath_s(path_of_file,
         NULL, 0,
@@ -48,7 +40,6 @@ int main(int argc, char* argv[])
 
     CAFFParser cP = CAFFParser();
     CAFFParser::CAFFMetadata parseResult = cP.ReturnPreview(&infile, fname, preview_path);
-
 
     std::cout << "--START--" << std::endl;
     std::cout << "{" << std::endl << "\t\"CreationDate\": \"" << parseResult.CreationDate << "\"," << std::endl << "\t\"Creator\": \"" << parseResult.Creator << "\"," << std::endl << "\t\"PreviewCaption\": \"" << parseResult.PreviewCaption << "\"," << std::endl << "\t\"PreviewTags\": \"" << parseResult.PreviewTags << "\"," << std::endl << "\t\"PreviewPath\": \"" << parseResult.PreviewPath << "\"" << std::endl << "}" << std::endl;

@@ -29,12 +29,12 @@ class CAFFParser
 		} typedef CAFFMetadata;
 
 	private:
-		IdAndLength GetBlockIdAndLength(std::ifstream* infile);
-		void ParseCAFFAnimation(std::ifstream* infile, char* fname, CAFFMetadata* caffMetadata, char* previewPath);
-		void ParseCAFFCredit(std::ifstream* infile, CAFFMetadata* caffMetadata);
+		IdAndLength GetBlockIdAndLength(std::istream* infile);
+		void ParseCAFFAnimation(std::istream* infile, char* fname, CAFFMetadata* caffMetadata, char* previewPath);
+		void ParseCAFFCredit(std::istream* infile, CAFFMetadata* caffMetadata);
 
 	public:
-		CAFFMetadata ReturnPreview(std::ifstream* infile, char* fname, char* previewPath);
+		CAFFMetadata ReturnPreview(std::istream* infile, char* fname, char* previewPath);
 
 };
 
