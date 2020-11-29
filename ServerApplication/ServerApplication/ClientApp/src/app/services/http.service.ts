@@ -57,6 +57,18 @@ export class HttpService {
       ));
   }
 
+  public listCaffFiles(): Observable<CaffImage[]> {
+    return this.getRequest<CaffImage[]>('caff/all');
+  }
+
+  public listMyCaffFiles(): Observable<CaffImage[]> {
+    return this.getRequest<CaffImage[]>('caff');
+  }
+
+  public deleteCaffFile(id: string): Observable<CaffImage[]> {
+    return this.deleteRequest<CaffImage[]>('caff/' + id);
+  }
+
   public addComment(imageId: string, comment: { text: string }): Observable<any> {
     return this.postRequest<any>(`caff/${imageId}/comments`, comment);
   }

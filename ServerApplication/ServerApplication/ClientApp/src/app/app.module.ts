@@ -19,6 +19,7 @@ import {FetchDataComponent} from './components/fetch-data/fetch-data.component';
 import {AdminComponent} from './components/admin/admin.component';
 import {DetailsComponent} from './components/details/details.component';
 import {UserDetailsComponent} from './components/user-details/user-details.component';
+import { FilesComponent } from './components/files/files.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import {UserDetailsComponent} from './components/user-details/user-details.compo
     DetailsComponent,
     UserLoginComponent,
     UserRegisterComponent,
-    UserDetailsComponent
+    UserDetailsComponent,
+    FilesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({appId: 'ng-cli-universal'}),
@@ -42,6 +44,7 @@ import {UserDetailsComponent} from './components/user-details/user-details.compo
       {path: '', component: HomeComponent, pathMatch: 'full'},
       {path: 'fetch-data', component: FetchDataComponent},
       {path: 'login', component: LoginRegisterComponent},
+      {path: 'files', component: FilesComponent},
       {path: 'user-details/:id', component: UserDetailsComponent},
       {path: 'user-details', component: UserDetailsComponent},
       {path: 'details/:imageid', component: DetailsComponent, canActivate: [AuthGuard]},

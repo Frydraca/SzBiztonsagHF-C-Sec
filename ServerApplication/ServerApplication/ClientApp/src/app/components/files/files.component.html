@@ -1,0 +1,38 @@
+<div class="search">
+    <form (ngSubmit)="onSubmit()" [formGroup]="searchFiles">
+        <div class="row">
+        <div class="form-group col-sm-4">
+          <input type="text" formControlName="name" class="form-control" id="search" aria-describedby="search" placeholder="Search for CAFF files...">
+        </div>
+        <div class="form-check checkbox col-sm-4">
+            <label class="form-check-label" for="exampleCheck1">Show only my own files</label>
+            <input type="checkbox" formControlName="myfiles" class="form-check-input form-control" id="exampleCheck1">
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+        </div>
+    </form>
+</div>
+<div class="upload">
+    <form>
+        <div class="form-group">
+          <label for="exampleFormControlFile1">Upload new CAFF file</label>
+          <input type="file" class="form-control-file" id="exampleFormControlFile1">
+        </div>
+      </form>
+</div>
+
+<h3>Files</h3>
+<div class="row">
+    <div class="col-sm-3" *ngFor="let file of filesToShow">
+        <div class="card">
+            <img class="card-img-top" src="..." alt="">
+            <div class="card-body">
+            <h5 class="card-title">{{file.name}}</h5>
+            <a [routerLink]="['details', file.id]" class="btn btn-primary">View</a>
+            <a (click)="deleteCaffFile(file.id)" *ngIf="file.owner === myData.id" class="btn btn-danger">Delete</a>
+            </div>
+      </div>
+    </div>
+</div>
