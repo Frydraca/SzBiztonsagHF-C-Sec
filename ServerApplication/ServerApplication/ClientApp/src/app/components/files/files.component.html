@@ -37,7 +37,7 @@
             <h5 class="card-title">{{file.name}}</h5>
             <a [routerLink]="['details', file.id]" class="btn btn-primary">View</a>
             <a (click)="deleteCaffFile(file.id)" *ngIf="file.owner === myData.id" class="btn btn-danger">Delete</a>
-            </div>
+        </div>
       </div>
     </div>
 </div>

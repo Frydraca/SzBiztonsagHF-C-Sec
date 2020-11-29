@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CaffImage } from 'src/app/models/caff-image';
+import { Comment } from 'src/app/models/comment';
 import { HttpService } from 'src/app/services/http.service';
 
 @Component({
@@ -74,9 +75,12 @@ export class FilesComponent implements OnInit {
     const formData = new FormData();
     formData.append('caffFile', this.fileDataForm.get('fileSource').value, this.fileDataForm.get('fileSource').value.name);
     let fileData = new CaffImage();
+    let comment = new Comment();
     fileData.comments = [];
     if (this.fileDataForm.get('comment').value !== '') {
-      fileData.comments.push(this.fileDataForm.get('comment').value)
+      comment.text = this.fileDataForm.get('comment').value
+      comment.creationDate = new Date().toISOString();
+      fileData.comments.push(comment);
     }
     fileData.name = this.fileDataForm.get('fileSource').value.name;
     this.httpService.postCaffFileData(fileData).subscribe(response => {
