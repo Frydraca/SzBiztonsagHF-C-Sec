@@ -105,7 +105,7 @@ namespace ServerApplication.BLL.Services
                 throw new Exception("You have no access to this user!");
             }
             var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "CAFFFiles", targetUser.Id);
-            if (!Directory.Exists(directoryPath))
+            if (Directory.Exists(directoryPath))
             {
                 Directory.Delete(directoryPath, true);
             }
